@@ -1,0 +1,248 @@
+{
+  "clients": [
+    {
+      "id": "1",
+      "name": "Mountain Time Vacation Rentals",
+      "status": "active",
+      "listingUrl": "https://www.mountaintimevacationrentals.com/rentals/results?all_properties=true",
+      "sheetId": "1sAhRE82JbslOnIa8d5Hrfnc_HszVv-MLuEReqlECpzI",
+      "elementSelectors": {
+        "listingContainer": {
+          "selector": ".results-list-properties .row > li",
+          "selectorIfAttribute": null
+        },
+        "listingTitle": {
+          "selector": ".results-list-property-title",
+          "selectorIfAttribute": null
+        },
+        "listingLink": {
+          "selector": "a.results-list-property-link",
+          "selectorIfAttribute": null
+        },
+        "listingDescription": {
+          "selector": "unknown",
+          "selectorIfAttribute": null
+        },
+        "listingPrice": {
+          "selector": ".results-list-property-info-price",
+          "selectorIfAttribute": null
+        },
+        "listingImage": {
+          "selector": null,
+          "selectorIfAttribute": "data-photo"
+        },
+        "listingAddress": {
+          "selector": null,
+          "selectorIfAttribute": "data-straddress1"
+        },
+        "listingCity": {
+          "selector": ".results-list-property",
+          "selectorIfAttribute": "data-strlocation"
+        },
+        "listingImageTag": {
+          "selector": null,
+          "selectorIfAttribute": null
+        },
+        "listingSalePrice": {
+          "selector": null,
+          "selectorIfAttribute": null
+        },
+        "listingLatitude": {
+          "selector": ".results-list-property",
+          "selectorIfAttribute": "data-latitude"
+        },
+        "listingLongitude": {
+          "selector": ".results-list-property",
+          "selectorIfAttribute": "data-longitude"
+        },
+        "listingNeighborhood": {
+          "selector": null,
+          "selectorIfAttribute": null
+        }
+      }
+    },
+    {
+      "id": "2",
+      "name": "Beach Side Management",
+      "status": "active",
+      "listingUrl": "https://beachsidemanagement.com/rentals",
+      "sheetId": "1sAhRE82JbslOnIa8d5Hrfnc_HszVv-MLuEReqlECpzI",
+      "elementSelectors": {
+        "listingContainer": {
+          "selector": ".be-property-widget",
+          "selectorIfAttribute": null
+        },
+        "listingTitle": {
+          "selector": null,
+          "selectorIfAttribute": "data-unitshortname"
+        },
+        "listingLink": {
+          "selector": "a[href]",
+          "selectorIfAttribute": null
+        },
+        "listingDescription": {
+          "selector": "span[itemprop='description']",
+          "selectorIfAttribute": null
+        },
+        "listingPrice": {
+          "selector": ".be-property-widget-info-pricing-price",
+          "selectorIfAttribute": null
+        },
+        "listingImage": {
+          "selector": null,
+          "selectorIfAttribute": "data-photo"
+        },
+        "listingAddress": {
+          "selector": null,
+          "selectorIfAttribute": "data-straddress1"
+        },
+        "listingCity": {
+          "selector": null,
+          "selectorIfAttribute": "data-strlocation"
+        },
+        "listingImageTag": {
+          "selector": null,
+          "selectorIfAttribute": null
+        },
+        "listingSalePrice": {
+          "selector": null,
+          "selectorIfAttribute": null
+        },
+        "listingLatitude": {
+          "selector": null,
+          "selectorIfAttribute": "data-latitude"
+        },
+        "listingLongitude": {
+          "selector": null,
+          "selectorIfAttribute": "data-longitude"
+        },
+        "listingNeighborhood": {
+          "selector": null,
+          "selectorIfAttribute": null
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "Cascadia Getaways",
+      "status": "active",
+      "listingUrl": "https://www.cascadiagetaways.com/vacation-rentals/results",
+      "sheetId": "1sAhRE82JbslOnIa8d5Hrfnc_HszVv-MLuEReqlECpzI",
+      "elementSelectors": {
+        "listingContainer": {
+          "selector": ".property",
+          "selectorIfAttribute": null
+        },
+        "listingTitle": {
+          "selector": ".details .title",
+          "selectorIfAttribute": null
+        },
+        "listingLink": {
+          "selector": "a.prop-box-anchor[href]",
+          "selectorIfAttribute": null
+        },
+        "listingDescription": {
+          "selector": "div.details + div",
+          "selectorIfAttribute": null
+        },
+        "listingPrice": {
+          "selector": ".details .boxprice span",
+          "selectorIfAttribute": null
+        },
+        "listingImage": {
+          "selector": ".carousel-instance img.active",
+          "selectorIfAttribute": null
+        },
+        "listingAddress": {
+          "selector": null,
+          "selectorIfAttribute": null
+        },
+        "listingCity": {
+          "selector": null,
+          "selectorIfAttribute": null
+        },
+        "listingImageTag": {
+          "selector": null,
+          "selectorIfAttribute": null
+        },
+        "listingSalePrice": {
+          "selector": null,
+          "selectorIfAttribute": null
+        },
+        "listingLatitude": {
+          "selector": null,
+          "selectorIfAttribute": null
+        },
+        "listingLongitude": {
+          "selector": null,
+          "selectorIfAttribute": null
+        },
+        "listingNeighborhood": {
+          "selector": null,
+          "selectorIfAttribute": null
+        }
+      }
+    },
+    {
+      "id": "4",
+      "name": "Greybeard Rentals",
+      "status": "active",
+      "listingUrl": "https://www.greybeardrentals.com/asheville-vacation-rentals#q=*%3A*",
+      "sheetId": "1sAhRE82JbslOnIa8d5Hrfnc_HszVv-MLuEReqlECpzI",
+      "elementSelectors": {
+        "listingContainer": {
+          "selector": "subtag",
+          "selectorIfAttribute": null
+        },
+        "listingTitle": {
+          "selector": "h4 a",
+          "selectorIfAttribute": null
+        },
+        "listingLink": {
+          "selector": "h4 a[href]",
+          "selectorIfAttribute": null
+        },
+        "listingDescription": {
+          "selector": "unknown",
+          "selectorIfAttribute": null
+        },
+        "listingPrice": {
+          "selector": "unknown",
+          "selectorIfAttribute": null
+        },
+        "listingImage": {
+          "selector": "a.image-wrap img",
+          "selectorIfAttribute": null
+        },
+        "listingAddress": {
+          "selector": null,
+          "selectorIfAttribute": null
+        },
+        "listingCity": {
+          "selector": "div.wrapper-hoodarea",
+          "selectorIfAttribute": null
+        },
+        "listingImageTag": {
+          "selector": null,
+          "selectorIfAttribute": null
+        },
+        "listingSalePrice": {
+          "selector": null,
+          "selectorIfAttribute": null
+        },
+        "listingLatitude": {
+          "selector": null,
+          "selectorIfAttribute": null
+        },
+        "listingLongitude": {
+          "selector": null,
+          "selectorIfAttribute": null
+        },
+        "listingNeighborhood": {
+          "selector": null,
+          "selectorIfAttribute": null
+        }
+      }
+    }
+  ]
+}
