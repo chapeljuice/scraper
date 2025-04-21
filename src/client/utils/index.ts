@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import dotenv from 'dotenv';
 import * as data from './../data/client-structures.json' assert { type: 'json' };
 import { scrapeListings } from '../../server/scraper.js';
-import type { ClientDataType } from '../../server/scraper.js';
+import type { ClientDataType } from '../../types/types.js';
 
 dotenv.config();
 
@@ -75,7 +75,7 @@ export async function updateSheet(clientIds: string[]) {
     listing.city,
     listing.link,
     listing.image_link,
-    null,
+    listing.image_tag,
     listing.description,
     null,
     listing.price,

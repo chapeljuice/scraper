@@ -9,55 +9,68 @@
       "elementSelectors": {
         "listingContainer": {
           "selector": ".results-list-properties .row > li",
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingTitle": {
           "selector": ".results-list-property-title",
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingLink": {
           "selector": "a.results-list-property-link",
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingDescription": {
           "selector": "unknown",
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingPrice": {
           "selector": ".results-list-property-info-price",
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingImage": {
-          "selector": null,
-          "selectorIfAttribute": "data-photo"
+          "selector": ".results-list-property",
+          "selectorIfAttribute": "data-photo",
+          "getDataFromDetailsPage": false
         },
         "listingAddress": {
-          "selector": null,
-          "selectorIfAttribute": "data-straddress1"
+          "selector": ".results-list-property",
+          "selectorIfAttribute": "data-straddress1",
+          "getDataFromDetailsPage": false
         },
         "listingCity": {
           "selector": ".results-list-property",
-          "selectorIfAttribute": "data-strlocation"
+          "selectorIfAttribute": "data-strlocation",
+          "getDataFromDetailsPage": false
         },
         "listingImageTag": {
-          "selector": null,
-          "selectorIfAttribute": null
+          "selector": "#propertyImage img",
+          "selectorIfAttribute": "alt",
+          "getDataFromDetailsPage": true
         },
         "listingSalePrice": {
           "selector": null,
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingLatitude": {
           "selector": ".results-list-property",
-          "selectorIfAttribute": "data-latitude"
+          "selectorIfAttribute": "data-latitude",
+          "getDataFromDetailsPage": false
         },
         "listingLongitude": {
           "selector": ".results-list-property",
-          "selectorIfAttribute": "data-longitude"
+          "selectorIfAttribute": "data-longitude",
+          "getDataFromDetailsPage": false
         },
         "listingNeighborhood": {
           "selector": null,
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         }
       }
     },
@@ -70,55 +83,68 @@
       "elementSelectors": {
         "listingContainer": {
           "selector": ".be-property-widget",
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingTitle": {
           "selector": null,
-          "selectorIfAttribute": "data-unitshortname"
+          "selectorIfAttribute": "data-unitshortname",
+          "getDataFromDetailsPage": false
         },
         "listingLink": {
           "selector": "a[href]",
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingDescription": {
           "selector": "span[itemprop='description']",
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingPrice": {
           "selector": ".be-property-widget-info-pricing-price",
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingImage": {
           "selector": null,
-          "selectorIfAttribute": "data-photo"
+          "selectorIfAttribute": "data-photo",
+          "getDataFromDetailsPage": false
         },
         "listingAddress": {
           "selector": null,
-          "selectorIfAttribute": "data-straddress1"
+          "selectorIfAttribute": "data-straddress1",
+          "getDataFromDetailsPage": false
         },
         "listingCity": {
           "selector": null,
-          "selectorIfAttribute": "data-strlocation"
+          "selectorIfAttribute": "data-strlocation",
+          "getDataFromDetailsPage": false
         },
         "listingImageTag": {
-          "selector": null,
-          "selectorIfAttribute": null
+          "selector": "img.be-property-widget-img",
+          "selectorIfAttribute": "alt",
+          "getDataFromDetailsPage": true
         },
         "listingSalePrice": {
           "selector": null,
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingLatitude": {
           "selector": null,
-          "selectorIfAttribute": "data-latitude"
+          "selectorIfAttribute": "data-latitude",
+          "getDataFromDetailsPage": false
         },
         "listingLongitude": {
           "selector": null,
-          "selectorIfAttribute": "data-longitude"
+          "selectorIfAttribute": "data-longitude",
+          "getDataFromDetailsPage": false
         },
         "listingNeighborhood": {
           "selector": null,
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         }
       }
     },
@@ -131,55 +157,68 @@
       "elementSelectors": {
         "listingContainer": {
           "selector": ".property",
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingTitle": {
           "selector": ".details .title",
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingLink": {
           "selector": "a.prop-box-anchor[href]",
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingDescription": {
           "selector": "div.details + div",
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingPrice": {
           "selector": ".details .boxprice span",
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingImage": {
           "selector": ".carousel-instance img.active",
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingAddress": {
           "selector": null,
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingCity": {
           "selector": null,
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingImageTag": {
           "selector": null,
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingSalePrice": {
           "selector": null,
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingLatitude": {
           "selector": null,
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingLongitude": {
           "selector": null,
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingNeighborhood": {
           "selector": null,
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         }
       }
     },
@@ -192,55 +231,68 @@
       "elementSelectors": {
         "listingContainer": {
           "selector": "subtag",
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingTitle": {
           "selector": "h4 a",
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingLink": {
           "selector": "h4 a[href]",
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingDescription": {
           "selector": "unknown",
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingPrice": {
           "selector": "unknown",
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingImage": {
           "selector": "a.image-wrap img",
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingAddress": {
           "selector": null,
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingCity": {
           "selector": "div.wrapper-hoodarea",
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingImageTag": {
           "selector": null,
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingSalePrice": {
           "selector": null,
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingLatitude": {
           "selector": null,
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingLongitude": {
           "selector": null,
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         },
         "listingNeighborhood": {
           "selector": null,
-          "selectorIfAttribute": null
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         }
       }
     }
