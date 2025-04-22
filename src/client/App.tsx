@@ -60,10 +60,13 @@ function App() {
 
   return (
     <div className="App">
+      <div className="logo-container">
+        <img src="/studio82-logo.png" alt="Studio 82 Logo" className="logo" />
+      </div>
       <h1>PMS Data Scraper</h1>
       <p>Select one or multiple clients below to update.</p>
       <p>Data will be saved in the Google Sheet associated with each client inside the <code>client-structures.json</code> file. Multiple clients can use the same <code>sheetId</code> if desired.</p>
-      <p>⚠️ This may take a few moments to complete. ⚠️</p>
+      <p className="warning">⚠️ This may take a few moments to complete. ⚠️</p>
       <div className={`form-group ${isLoading ? 'loading' : ''}`}>
         <label htmlFor="client">Select client(s) to update:</label>
         <select id="client" name="client" value={selectedOptions} onChange={handleSelectChange} multiple>
@@ -76,7 +79,7 @@ function App() {
         <div className="cta-container">
           <button onClick={handleButtonClick} disabled={isLoading || selectedOptions.length < 1} className={`${success ? 'success' : ''}`}>
             {success ? (`✅ Data Updated!`) :
-              !isLoading ? (`Update Google Sheet${selectedOptions.length >1 ? 's' : ''}`) :
+              !isLoading ? (`Update Google Sheet${selectedOptions.length >1 ? 's' : ''} →`) :
               isLoading && <div className="spinner"></div>
             }
           </button>

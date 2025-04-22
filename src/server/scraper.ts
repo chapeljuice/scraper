@@ -84,9 +84,9 @@ async function scrapeDetailPage(browser: puppeteer.Browser, url: string, data: C
   const page = await browser.newPage();
   
   // Enable console logging
-  page.on('console', msg => {
-    console.log('Browser console:', msg.text());
-  });
+  // page.on('console', msg => {
+  //   console.log('Browser console:', msg.text());
+  // });
   
   try {
     // Implement rate limiting for detail pages

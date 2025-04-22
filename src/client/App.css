@@ -18,7 +18,8 @@
 .form-group {
   align-items: flex-start;
   background-color: #e3f7ff;
-  border: 2px solid #ccc;
+  color: #213547;
+  border: 2px solid #FD16B7;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
@@ -45,20 +46,26 @@
 }
 
 .form-group button {
-  background-color: #007bff;
+  background-color: #FD16B7;
   border: none;
-  border-radius: 5px;
+  border-radius: 30px 30px 30px 30px;
+  box-shadow: -100px 0px 100px -2;
   color: white;
   cursor: pointer;
   font-size: 1rem;
+  font-family: "Poppins", Sans-serif;
+  font-size: 13px;
+  font-weight: 600;
   height: 42px;
+  letter-spacing: 1.2px;
   padding: 0.5rem 1rem;
   transition: all 180ms ease-in-out;
+  text-transform: uppercase;
   width: 250px;
 }
 
 .form-group button:hover {
-  background-color: #0056b3;
+  background-color: #c22794;
 }
 
 .form-group button.success {
@@ -67,7 +74,12 @@
 
 .form-group button:disabled {
   background-color: #ccc;
+  background-image: none;
   cursor: not-allowed;
+}
+
+.warning {
+  color: #FD16B7;
 }
 
 code {
@@ -94,5 +106,23 @@ code {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+.logo-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.logo {
+  max-width: 200px;
+  height: auto;
+}
+
+@media (prefers-color-scheme: dark) {
+  .form-group {
+    background-color: #1f2331;
+    color: #e3f7ff;
   }
 }
