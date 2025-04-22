@@ -45,7 +45,7 @@ export async function updateSheet(clientIds: string[]) {
     console.log('No client IDs provided. Exiting...');
     return;
   }
-  const allClientData = data.clients as ClientDataType[];
+  const allClientData = data.clients as unknown as ClientDataType[];
   const selectedClientData = allClientData.filter(obj => clientIds.includes(obj.id));
   if (selectedClientData.length === 0) {
     console.log('No matching client data found. Exiting...');

@@ -1,25 +1,35 @@
 import React, { useState } from 'react';
+import Select from 'react-select';
 import "./App.css";
 import data from '../client/data/client-structures.json';
 
+interface ClientOption {
+  value: string;
+  label: string;
+}
 
 function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  const [selectedOptions, setSelectedOptions] = useState<ClientOption[]>([]);
 
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const clientOptions: ClientOption[] = data.clients.map(client => ({
+    value: client.id,
+    label: client.name
+  }));
+
+  const handleSelectChange = (selected: readonly ClientOption[]) => {
     setIsLoading(false);
     setSuccess(false);
-    const options = event.target.options;
-    const selectedValues: string[] = [];
-    for (let i = 0; i < options.length; i++) {
-      if (options[i].selected) {
-        selectedValues.push(options[i].value);
-      }
+    
+    // Check if the last selected option was "Select All"
+    const lastSelected = selected[selected.length - 1];
+    if (lastSelected && lastSelected.value === 'select-all') {
+      setSelectedOptions(clientOptions);
+    } else {
+      setSelectedOptions([...selected]);
     }
-    setSelectedOptions(selectedValues);
   }
 
   const handleButtonClick = async () => {
@@ -38,7 +48,7 @@ function App() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ selectedOptions }),
+        body: JSON.stringify({ selectedOptions: selectedOptions.map(option => option.value) }),
       });
       if (!response.ok) {
         console.log({response});
@@ -58,6 +68,12 @@ function App() {
     }
   }
 
+  // Add Select All option to the beginning of the options array
+  const optionsWithSelectAll = [
+    { value: 'select-all', label: 'Select All Clients' },
+    ...clientOptions
+  ];
+
   return (
     <div className="App">
       <div className="logo-container">
@@ -69,13 +85,18 @@ function App() {
       <p className="warning">⚠️ This may take a few moments to complete. ⚠️</p>
       <div className={`form-group ${isLoading ? 'loading' : ''}`}>
         <label htmlFor="client">Select client(s) to update:</label>
-        <select id="client" name="client" value={selectedOptions} onChange={handleSelectChange} multiple>
-          {data.clients.map((client) => (
-            <option key={client.id} value={client.id}>
-              {client.name}
-            </option>
-          ))}
-        </select>
+        <Select
+          id="client"
+          name="client"
+          isMulti
+          options={optionsWithSelectAll}
+          value={selectedOptions}
+          onChange={handleSelectChange}
+          className="react-select-container"
+          classNamePrefix="react-select"
+          placeholder="Select or search clients..."
+          isOptionDisabled={(option) => option.value === 'select-all' && selectedOptions.length > 0}
+        />
         <div className="cta-container">
           <button onClick={handleButtonClick} disabled={isLoading || selectedOptions.length < 1} className={`${success ? 'success' : ''}`}>
             {success ? (`✅ Data Updated!`) :
@@ -83,7 +104,6 @@ function App() {
               isLoading && <div className="spinner"></div>
             }
           </button>
-          
         </div>
       </div>
       {error && <p className="error">{error}</p>}
