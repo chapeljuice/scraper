@@ -23,12 +23,18 @@ function App() {
     setIsLoading(false);
     setSuccess(false);
     
-    // Check if the last selected option was "Select All"
+    // Check if the last selected option was "Select All" or "Clear All"
     const lastSelected = selected[selected.length - 1];
-    if (lastSelected && lastSelected.value === 'select-all') {
-      setSelectedOptions(clientOptions);
+    if (lastSelected) {
+      if (lastSelected.value === 'select-all') {
+        setSelectedOptions(clientOptions);
+      } else if (lastSelected.value === 'clear-all') {
+        setSelectedOptions([]);
+      } else {
+        setSelectedOptions([...selected]);
+      }
     } else {
-      setSelectedOptions([...selected]);
+      setSelectedOptions([]);
     }
   }
 
@@ -68,9 +74,10 @@ function App() {
     }
   }
 
-  // Add Select All option to the beginning of the options array
-  const optionsWithSelectAll = [
+  // Add Select All and Clear All options to the beginning of the options array
+  const optionsWithActions = [
     { value: 'select-all', label: 'Select All Clients' },
+    { value: 'clear-all', label: 'Clear All Selections' },
     ...clientOptions
   ];
 
@@ -89,13 +96,16 @@ function App() {
           id="client"
           name="client"
           isMulti
-          options={optionsWithSelectAll}
+          options={optionsWithActions}
           value={selectedOptions}
           onChange={handleSelectChange}
           className="react-select-container"
           classNamePrefix="react-select"
           placeholder="Select or search clients..."
-          isOptionDisabled={(option) => option.value === 'select-all' && selectedOptions.length > 0}
+          isOptionDisabled={(option) => 
+            (option.value === 'select-all' && selectedOptions.length === clientOptions.length) ||
+            (option.value === 'clear-all' && selectedOptions.length === 0)
+          }
         />
         <div className="cta-container">
           <button onClick={handleButtonClick} disabled={isLoading || selectedOptions.length < 1} className={`${success ? 'success' : ''}`}>
