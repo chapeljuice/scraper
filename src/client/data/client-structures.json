@@ -4,38 +4,43 @@
       "id": "1",
       "name": "Mountain Time Vacation Rentals",
       "status": "active",
-      "listingUrl": "https://www.mountaintimevacationrentals.com/rentals/results?all_properties=true",
+      "listingsUrl": "https://www.mountaintimevacationrentals.com/rentals/results?all_properties=true",
       "sheetId": "1sAhRE82JbslOnIa8d5Hrfnc_HszVv-MLuEReqlECpzI",
       "elementSelectors": {
-        "listingContainer": {
+        "listingsPageContainer": {
           "selector": ".results-list-properties .row > li",
           "selectorIfAttribute": null,
           "getDataFromDetailsPage": false
         },
-        "listingTitle": {
-          "selector": ".results-list-property-title",
-          "selectorIfAttribute": null,
-          "getDataFromDetailsPage": false
-        },
-        "listingLink": {
+        "listingDetailPageUrl": {
           "selector": "a.results-list-property-link",
           "selectorIfAttribute": null,
           "getDataFromDetailsPage": false
         },
-        "listingDescription": {
-          "selector": "unknown",
+        "listingDetailContainer": {
+          "selector": "#propertyDetails",
           "selectorIfAttribute": null,
-          "getDataFromDetailsPage": false
+          "getDataFromDetailsPage": true
+        },
+        "listingTitle": {
+          "selector": ".property-name",
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": true
+        },
+        "listingDescription": {
+          "selector": "#descBlock",
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": true
         },
         "listingPrice": {
-          "selector": ".results-list-property-info-price",
+          "selector": ".price-range",
           "selectorIfAttribute": null,
-          "getDataFromDetailsPage": false
+          "getDataFromDetailsPage": true
         },
         "listingImage": {
-          "selector": ".results-list-property",
-          "selectorIfAttribute": "data-photo",
-          "getDataFromDetailsPage": false
+          "selector": "#propertyImage img",
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": true
         },
         "listingAddress": {
           "selector": ".results-list-property",
@@ -71,6 +76,11 @@
           "selector": null,
           "selectorIfAttribute": null,
           "getDataFromDetailsPage": false
+        },
+        "listingRegion": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         }
       }
     },
@@ -78,38 +88,43 @@
       "id": "2",
       "name": "Beach Side Management",
       "status": "active",
-      "listingUrl": "https://beachsidemanagement.com/rentals",
+      "listingsUrl": "https://beachsidemanagement.com/rentals",
       "sheetId": "1sAhRE82JbslOnIa8d5Hrfnc_HszVv-MLuEReqlECpzI",
       "elementSelectors": {
-        "listingContainer": {
+        "listingsPageContainer": {
           "selector": ".be-property-widget",
           "selectorIfAttribute": null,
           "getDataFromDetailsPage": false
         },
-        "listingTitle": {
-          "selector": null,
-          "selectorIfAttribute": "data-unitshortname",
-          "getDataFromDetailsPage": false
-        },
-        "listingLink": {
+        "listingDetailPageUrl": {
           "selector": "a[href]",
           "selectorIfAttribute": null,
           "getDataFromDetailsPage": false
         },
-        "listingDescription": {
-          "selector": "span[itemprop='description']",
+        "listingDetailContainer": {
+          "selector": ".pdp-main",
           "selectorIfAttribute": null,
-          "getDataFromDetailsPage": false
+          "getDataFromDetailsPage": true
+        },
+        "listingTitle": {
+          "selector": ".be-property-widget-info-heading-link",
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": true
+        },
+        "listingDescription": {
+          "selector": ".be-read-more-wrap",
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": true
         },
         "listingPrice": {
           "selector": ".be-property-widget-info-pricing-price",
           "selectorIfAttribute": null,
-          "getDataFromDetailsPage": false
+          "getDataFromDetailsPage": true
         },
         "listingImage": {
-          "selector": null,
-          "selectorIfAttribute": "data-photo",
-          "getDataFromDetailsPage": false
+          "selector": ".be-property-widget-img",
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": true
         },
         "listingAddress": {
           "selector": null,
@@ -145,6 +160,11 @@
           "selector": null,
           "selectorIfAttribute": null,
           "getDataFromDetailsPage": false
+        },
+        "listingRegion": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         }
       }
     },
@@ -152,28 +172,33 @@
       "id": "3",
       "name": "Cascadia Getaways",
       "status": "active",
-      "listingUrl": "https://www.cascadiagetaways.com/vacation-rentals/results",
+      "listingsUrl": "https://www.cascadiagetaways.com/vacation-rentals/results",
       "sheetId": "1sAhRE82JbslOnIa8d5Hrfnc_HszVv-MLuEReqlECpzI",
       "elementSelectors": {
-        "listingContainer": {
+        "listingsPageContainer": {
           "selector": ".property",
           "selectorIfAttribute": null,
           "getDataFromDetailsPage": false
         },
-        "listingTitle": {
-          "selector": ".details .title",
-          "selectorIfAttribute": null,
-          "getDataFromDetailsPage": false
-        },
-        "listingLink": {
+        "listingDetailPageUrl": {
           "selector": "a.prop-box-anchor[href]",
           "selectorIfAttribute": null,
           "getDataFromDetailsPage": false
         },
-        "listingDescription": {
-          "selector": "div.details + div",
+        "listingDetailContainer": {
+          "selector": ".post.contained",
           "selectorIfAttribute": null,
-          "getDataFromDetailsPage": false
+          "getDataFromDetailsPage": true
+        },
+        "listingTitle": {
+          "selector": "#unitTitle",
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": true
+        },
+        "listingDescription": {
+          "selector": ".detailsec-content",
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": true
         },
         "listingPrice": {
           "selector": ".details .boxprice span",
@@ -219,6 +244,11 @@
           "selector": null,
           "selectorIfAttribute": null,
           "getDataFromDetailsPage": false
+        },
+        "listingRegion": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         }
       }
     },
@@ -226,21 +256,21 @@
       "id": "4",
       "name": "Greybeard Rentals",
       "status": "active",
-      "listingUrl": "https://www.greybeardrentals.com/asheville-vacation-rentals#q=*%3A*",
+      "listingsUrl": "https://www.greybeardrentals.com/asheville-vacation-rentals#q=*%3A*",
       "sheetId": "1sAhRE82JbslOnIa8d5Hrfnc_HszVv-MLuEReqlECpzI",
       "elementSelectors": {
-        "listingContainer": {
+        "listingsPageContainer": {
           "selector": "subtag",
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingDetailPageUrl": {
+          "selector": "h4 a[href]",
           "selectorIfAttribute": null,
           "getDataFromDetailsPage": false
         },
         "listingTitle": {
           "selector": "h4 a",
-          "selectorIfAttribute": null,
-          "getDataFromDetailsPage": false
-        },
-        "listingLink": {
-          "selector": "h4 a[href]",
           "selectorIfAttribute": null,
           "getDataFromDetailsPage": false
         },
@@ -290,6 +320,11 @@
           "getDataFromDetailsPage": false
         },
         "listingNeighborhood": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingRegion": {
           "selector": null,
           "selectorIfAttribute": null,
           "getDataFromDetailsPage": false

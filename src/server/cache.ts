@@ -41,12 +41,12 @@ export class ScraperCache {
     }
   }
 
-  private getCacheKey(client: ClientDataType): string {
-    return `${client.id}-${client.listingUrl}`;
+  private generateCacheKey(client: ClientDataType): string {
+    return `${client.id}-${client.listingsUrl}`;
   }
 
   public getCachedData(client: ClientDataType): Results[] | null {
-    const key = this.getCacheKey(client);
+    const key = this.generateCacheKey(client);
     const entry = this.cache[key];
 
     if (!entry) {
@@ -64,7 +64,7 @@ export class ScraperCache {
   }
 
   public setCachedData(client: ClientDataType, data: Results[]): void {
-    const key = this.getCacheKey(client);
+    const key = this.generateCacheKey(client);
     this.cache[key] = {
       timestamp: Date.now(),
       data

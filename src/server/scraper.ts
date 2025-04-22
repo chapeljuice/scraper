@@ -79,14 +79,26 @@ function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+// Helper function to format price
+function formatPrice(price: string): string {
+  if (!price) return '';
+  
+  // Remove all non-numeric characters except commas and periods
+  const cleaned = price.replace(/[^0-9,.]/g, '');
+  
+  // Split by common separators (comma, space, dash, etc.)
+  const prices = cleaned.split(/[, -]/);
+  
+  // Get the first price and remove any remaining commas
+  const firstPrice = prices[0].replace(/,/g, '');
+  
+  // Remove decimal points and everything after them
+  return firstPrice.split('.')[0];
+}
+
 // Function to scrape a detail page
 async function scrapeDetailPage(browser: puppeteer.Browser, url: string, data: ClientDataType): Promise<Partial<Results>> {
   const page = await browser.newPage();
-  
-  // Enable console logging
-  // page.on('console', msg => {
-  //   console.log('Browser console:', msg.text());
-  // });
   
   try {
     // Implement rate limiting for detail pages
@@ -121,28 +133,6 @@ async function scrapeDetailPage(browser: puppeteer.Browser, url: string, data: C
       };
 
       // @ts-ignore
-      window.getLinkContent = function(element: Element, selector: string | null, attribute: string | null): string {
-        if (!selector && !attribute) return '';
-        
-        try {
-          if (selector && !attribute) {
-            const link = element.querySelector(selector) as HTMLAnchorElement;
-            return link?.href || '';
-          }
-          
-          if (attribute) {
-            const foundElement = selector ? element.querySelector(selector) : element;
-            return foundElement?.getAttribute(attribute)?.trim() || '';
-          }
-        } catch (error) {
-          console.error('Error in getLinkContent:', error);
-          return '';
-        }
-        
-        return '';
-      };
-
-      // @ts-ignore
       window.getImageContent = function(element: Element, selector: string | null, attribute: string | null): string {
         if (!selector && !attribute) return '';
         
@@ -163,31 +153,61 @@ async function scrapeDetailPage(browser: puppeteer.Browser, url: string, data: C
         
         return '';
       };
+
+      // @ts-ignore
+      window.formatPrice = function(price: string): string {
+        if (!price) return '';
+        
+        // Remove all non-numeric characters except commas and periods
+        const cleaned = price.replace(/[^0-9,.]/g, '');
+        
+        // Split by common separators (comma, space, dash, etc.)
+        const prices = cleaned.split(/[, -]/);
+        
+        // Get the first price and remove any remaining commas
+        const firstPrice = prices[0].replace(/,/g, '');
+        
+        // Remove decimal points and everything after them
+        return firstPrice.split('.')[0];
+      };
     });
 
     const detailData = await page.evaluate((data) => {
       const result: Partial<Results> = {};
-      // Check if any selectors are marked to get data from details page
+
+      // Get data from detail page for fields where getDataFromDetailsPage is true
       Object.entries(data.elementSelectors).forEach(([key, selector]) => {
+        if (key === 'listingsPageContainer' || key === 'listingDetailPageUrl') return;
         
         if (selector.getDataFromDetailsPage) {
-          
-          const value = (window as any).getElementContent(
-            document,
-            selector.selector || null,
-            selector.selectorIfAttribute || null
-          );
-          
+          let value = '';
+          if (key === 'listingImage') {
+            value = (window as any).getImageContent(
+              document,
+              selector.selector,
+              selector.selectorIfAttribute
+            );
+          } else {
+            value = (window as any).getElementContent(
+              document,
+              selector.selector,
+              selector.selectorIfAttribute
+            );
+          }
+
           // Map the selector key to the corresponding Results field
           switch (key) {
+            case 'listingTitle':
+              result.title = value;
+              break;
             case 'listingDescription':
               result.description = value;
               break;
             case 'listingPrice':
-              result.price = value;
+              result.price = (window as any).formatPrice(value);
               break;
             case 'listingSalePrice':
-              result.sale_price = value;
+              result.sale_price = (window as any).formatPrice(value);
               break;
             case 'listingImage':
               result.image_link = value;
@@ -195,7 +215,21 @@ async function scrapeDetailPage(browser: puppeteer.Browser, url: string, data: C
             case 'listingImageTag':
               result.image_tag = value;
               break;
-            // Add more cases as needed
+            case 'listingAddress':
+              result.address = value;
+              break;
+            case 'listingCity':
+              result.city = value;
+              break;
+            case 'listingLatitude':
+              result.latitude = value;
+              break;
+            case 'listingLongitude':
+              result.longitude = value;
+              break;
+            case 'listingNeighborhood':
+              result.neighborhood = value;
+              break;
           }
         }
       });
@@ -206,37 +240,32 @@ async function scrapeDetailPage(browser: puppeteer.Browser, url: string, data: C
     return detailData;
   } catch (error) {
     console.error(`Error scraping detail page ${url}:`, error);
-    return {};
+    throw error;
   } finally {
     await page.close();
   }
 }
 
 export async function scrapeListings(data: ClientDataType): Promise<Scraper> {
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  });
   const page = await browser.newPage();
 
   try {
-    console.log(`Scraping listings from: ${data.listingUrl}`);
+    console.log(`Scraping listings from: ${data.listingsUrl}`);
     
     // Implement rate limiting
     await delay(1000); // 1 second delay between requests
     
-    await page.goto(data.listingUrl, { waitUntil: 'networkidle2' });
-    await page.waitForSelector(data.elementSelectors.listingContainer.selector, { visible: true });
-    
-    page.on('console', async (msg) => {
-      const msgArgs = msg.args();
-      for (let i = 0; i < msgArgs.length; ++i) {
-        console.log(await msgArgs[i].jsonValue());
-      }
-    });
+    await page.goto(data.listingsUrl, { waitUntil: 'networkidle2' });
+    await page.waitForSelector(data.elementSelectors.listingsPageContainer.selector, { visible: true });
     
     // Define helper functions in the browser context
     await page.evaluate(() => {
       // @ts-ignore
       window.getElementContent = function(element: Element, selector: string | null, attribute: string | null): string {
-        // If no selector or attribute is provided, return empty string
         if (!selector && !attribute) return '';
         
         try {
@@ -300,80 +329,107 @@ export async function scrapeListings(data: ClientDataType): Promise<Scraper> {
         
         return '';
       };
+
+      // @ts-ignore
+      window.formatPrice = function(price: string): string {
+        if (!price) return '';
+        
+        // Remove all non-numeric characters except commas and periods
+        const cleaned = price.replace(/[^0-9,.]/g, '');
+        
+        // Split by common separators (comma, space, dash, etc.)
+        const prices = cleaned.split(/[, -]/);
+        
+        // Get the first price and remove any remaining commas
+        const firstPrice = prices[0].replace(/,/g, '');
+        
+        // Remove decimal points and everything after them
+        return firstPrice.split('.')[0];
+      };
     });
     
-    const listings = await page.evaluate((data) => {    
-      const results: Results[] = [];
-      const listingElements = document.querySelectorAll(data.elementSelectors.listingContainer.selector);
+    // Get initial data from listings page
+    const listingsData = await page.evaluate((data) => {    
+      const results: Partial<Results>[] = [];
+      const listingElements = document.querySelectorAll(data.elementSelectors.listingsPageContainer.selector);
 
       if (listingElements.length === 0) {
-        console.error(`No listing elements found for selector: ${data.elementSelectors.listingContainer.selector}`);
+        console.error(`No listing elements found for selector: ${data.elementSelectors.listingsPageContainer.selector}`);
         return results;
       }
 
       listingElements.forEach(el => {
-        const {
-          listingTitle,
-          listingLink,
-          listingDescription,
-          listingImage,
-          listingPrice,
-          listingAddress,
-          listingCity,
-          listingImageTag,
-          listingSalePrice,
-          listingLatitude,
-          listingLongitude,
-          listingNeighborhood
-        } = data.elementSelectors;
-
-        // Only get data that isn't marked for detail page
-        const result: Results = {
-          title: (window as any).getElementContent(el, listingTitle?.selector || null, listingTitle?.selectorIfAttribute || null),
-          brand: data.name,
-          address: (window as any).getElementContent(el, listingAddress?.selector || null, listingAddress?.selectorIfAttribute || null),
-          city: (window as any).getElementContent(el, listingCity?.selector || null, listingCity?.selectorIfAttribute || null),
-          link: (window as any).getLinkContent(el, listingLink?.selector || null, listingLink?.selectorIfAttribute || null),
-          image_link: (window as any).getImageContent(el, listingImage?.selector || null, listingImage?.selectorIfAttribute || null),
-          // Only get these fields if they're not marked for detail page
-          image_tag: (window as any).getElementContent(el, listingImageTag?.selector || null, listingImageTag?.selectorIfAttribute || null),
-          description: (window as any).getElementContent(el, listingDescription?.selector || null, listingDescription?.selectorIfAttribute || null),
-          sale_price: (window as any).getElementContent(el, listingSalePrice?.selector || null, listingSalePrice?.selectorIfAttribute || null),
-          price: (window as any).getElementContent(el, listingPrice?.selector || null, listingPrice?.selectorIfAttribute || null),
-          latitude: (window as any).getElementContent(el, listingLatitude?.selector || null, listingLatitude?.selectorIfAttribute || null),
-          longitude: (window as any).getElementContent(el, listingLongitude?.selector || null, listingLongitude?.selectorIfAttribute || null),
-          neighborhood: (window as any).getElementContent(el, listingNeighborhood?.selector || null, listingNeighborhood?.selectorIfAttribute || null),
-          // Initialize other fields as empty strings
-          loyalty_program: '',
-          margin_level: '',
-          star_rating: '',
-          address2: '',
-          address3: '',
-          city_id: '',
-          region: '',
-          postal_code: '',
-          unit_number: '',
-          priority: '',
-          number_of_rooms: '',
-          android_app_name: '',
-          android_package: '',
-          android_url: '',
-          ios_app_name: '',
-          ios_app_store_id: '',
-          ios_url: '',
-          ipad_app_name: '',
-          ipad_app_store_id: '',
-          ipad_url: '',
-          iphone_app_name: '',
-          iphone_app_store_id: '',
-          iphone_url: '',
-          windows_phone_app_id: '',
-          windows_phone_app_name: '',
-          windows_phone_url: '',
-          video_url: '',
-          video_tag: '',
-          category: ''
+        const result: Partial<Results> = {
+          brand: data.name
         };
+
+        // Get data from listings page for fields where getDataFromDetailsPage is false
+        Object.entries(data.elementSelectors).forEach(([key, selector]) => {
+          if (key === 'listingsPageContainer' || key === 'listingDetailContainer') return;
+          
+          if (!selector.getDataFromDetailsPage) {
+            let value = '';
+            if (key === 'listingDetailPageUrl') {
+              value = (window as any).getLinkContent(
+                el,
+                selector.selector,
+                selector.selectorIfAttribute
+              );
+            } else if (key === 'listingImage') {
+              value = (window as any).getImageContent(
+                el,
+                selector.selector,
+                selector.selectorIfAttribute
+              );
+            } else {
+              value = (window as any).getElementContent(
+                el,
+                selector.selector,
+                selector.selectorIfAttribute
+              );
+            }
+
+            // Map the selector key to the corresponding Results field
+            switch (key) {
+              case 'listingTitle':
+                result.title = value;
+                break;
+              case 'listingDescription':
+                result.description = value;
+                break;
+              case 'listingPrice':
+                result.price = (window as any).formatPrice(value);
+                break;
+              case 'listingSalePrice':
+                result.sale_price = (window as any).formatPrice(value);
+                break;
+              case 'listingImage':
+                result.image_link = value;
+                break;
+              case 'listingImageTag':
+                result.image_tag = value;
+                break;
+              case 'listingAddress':
+                result.address = value;
+                break;
+              case 'listingCity':
+                result.city = value;
+                break;
+              case 'listingLatitude':
+                result.latitude = value;
+                break;
+              case 'listingLongitude':
+                result.longitude = value;
+                break;
+              case 'listingNeighborhood':
+                result.neighborhood = value;
+                break;
+              case 'listingDetailPageUrl':
+                result.link = value;
+                break;
+            }
+          }
+        });
 
         results.push(result);
       });
@@ -381,14 +437,19 @@ export async function scrapeListings(data: ClientDataType): Promise<Scraper> {
       return results;
     }, data);
 
-    console.log('Initial listings scraped:', listings.length);
+    console.log('Initial listings data scraped:', listingsData.length);
     
     // Scrape detail pages for listings that need additional data
     const listingsWithDetails = await Promise.all(
-      listings.map(async (listing) => {
+      listingsData.map(async (listing) => {
         if (listing.link) {
-          const detailData = await scrapeDetailPage(browser, listing.link, data);
-          return { ...listing, ...detailData };
+          try {
+            const detailData = await scrapeDetailPage(browser, listing.link, data);
+            return { ...listing, ...detailData };
+          } catch (error) {
+            console.error(`Failed to scrape detail page ${listing.link}:`, error);
+            return listing;
+          }
         }
         return listing;
       })
