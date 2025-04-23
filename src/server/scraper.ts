@@ -5,95 +5,158 @@ import { ScraperCache } from './cache.ts';
 // Define the Scraper type here
 type Scraper = Results[];
 
+// Extend Window interface to include our helper functions
+declare global {
+  interface Window {
+    getElementContent: (element: Element, selector: string | null, attribute: string | null) => string;
+    getLinkContent: (element: Element, selector: string | null, attribute: string | null) => string;
+    getImageContent: (element: Element, selector: string | null, attribute: string | null) => string;
+    formatPrice: (price: string) => string;
+    selectorToFieldMap: Record<string, keyof Results>;
+  }
+}
+
 // Create a singleton cache instance
 const cache = new ScraperCache();
-
-// Helper function to get element content based on selector and attribute
-function getElementContent(
-  element: Element,
-  selector: string | null,
-  attribute: string | null
-): string {
-  if (!selector && !attribute) return '';
-  
-  if (selector && !attribute) {
-    return element.querySelector(selector)?.textContent?.trim() || '';
-  }
-  
-  if (attribute) {
-    if (selector) {
-      return element.querySelector(selector)?.getAttribute(attribute)?.trim() || '';
-    }
-    return element.getAttribute(attribute)?.trim() || '';
-  }
-  
-  return '';
-}
-
-// Helper function to get link content
-function getLinkContent(
-  element: Element,
-  selector: string | null,
-  attribute: string | null
-): string {
-  if (!selector && !attribute) return '';
-  
-  if (selector && !attribute) {
-    return (element.querySelector(selector) as HTMLAnchorElement)?.href || '';
-  }
-  
-  if (attribute) {
-    if (selector) {
-      return element.querySelector(selector)?.getAttribute(attribute)?.trim() || '';
-    }
-    return element.getAttribute(attribute)?.trim() || '';
-  }
-  
-  return '';
-}
-
-// Helper function to get image content
-function getImageContent(
-  element: Element,
-  selector: string | null,
-  attribute: string | null
-): string {
-  if (!selector && !attribute) return '';
-  
-  if (selector && !attribute) {
-    return (element.querySelector(selector) as HTMLImageElement)?.src || '';
-  }
-  
-  if (attribute) {
-    if (selector) {
-      return element.querySelector(selector)?.getAttribute(attribute)?.trim() || '';
-    }
-    return element.getAttribute(attribute)?.trim() || '';
-  }
-  
-  return '';
-}
 
 // Rate limiting helper
 function delay(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// Helper function to format price
-function formatPrice(price: string): string {
-  if (!price) return '';
-  
-  // Remove all non-numeric characters except commas and periods
-  const cleaned = price.replace(/[^0-9,.]/g, '');
-  
-  // Split by common separators (comma, space, dash, etc.)
-  const prices = cleaned.split(/[, -]/);
-  
-  // Get the first price and remove any remaining commas
-  const firstPrice = prices[0].replace(/,/g, '');
-  
-  // Remove decimal points and everything after them
-  return firstPrice.split('.')[0];
+async function defineBrowserHelpers(page: puppeteer.Page) {
+  await page.evaluate(() => {
+    // @ts-ignore
+    window.selectorToFieldMap = {
+      'listingTitle': 'title',
+      'listingDescription': 'description',
+      'listingPrice': 'price',
+      'listingSalePrice': 'sale_price',
+      'listingImage': 'image_link',
+      'listingImageTag': 'image_tag',
+      'listingAddress': 'address',
+      'listingCity': 'city',
+      'listingLatitude': 'latitude',
+      'listingLongitude': 'longitude',
+      'listingNeighborhood': 'neighborhood',
+      'listingRegion': 'region',
+      'listingLoyaltyProgram': 'loyalty_program',
+      'listingMarginLevel': 'margin_level',
+      'listingStarRating': 'star_rating',
+      'listingAddress2': 'address2',
+      'listingAddress3': 'address3',
+      'listingPostalCode': 'postal_code',
+      'listingUnitNumber': 'unit_number',
+      'listingPriority': 'priority',
+      'listingNumberOfRooms': 'number_of_rooms',
+      'listingAndroidAppName': 'android_app_name',
+      'listingAndroidAppPackage': 'android_package',
+      'listingAndroidAppUrl': 'android_url',
+      'listingIosAppName': 'ios_app_name',
+      'listingIosAppStoreId': 'ios_app_store_id',
+      'listingIosUrl': 'ios_url',
+      'listingIpadAppName': 'ipad_app_name',
+      'listingIpadAppStoreId': 'ipad_app_store_id',
+      'listingIpadAppUrl': 'ipad_url',
+      'listingWindowsPhoneAppId': 'windows_phone_app_id',
+      'listingWindowsPhoneAppName': 'windows_phone_app_name',
+      'listingWindowsPhoneUrl': 'windows_phone_url',
+      'listingVideoUrl': 'video_url',
+      'listingVideoTag': 'video_tag',
+      'listingCategory': 'category',
+      'listingDetailPageUrl': 'link'
+    };
+
+    // @ts-ignore
+    window.getElementContent = function(element: Element, selector: string | null, attribute: string | null): string {
+      // If no selector or attribute is provided, return empty string
+      if (!selector && !attribute) return '';
+      
+      try {
+        // Only try to querySelector if we have a valid selector
+        const foundElement = selector ? element.querySelector(selector) : element;
+        
+        if (foundElement) {
+          if (attribute) {
+            return foundElement.getAttribute(attribute)?.trim() || '';
+          }
+          return foundElement.textContent?.trim() || '';
+        }
+      } catch (error) {
+        console.error('Error in getElementContent:', error);
+        return '';
+      }
+      
+      return '';
+    };
+
+    // helper function to get the URL of a link
+    // @ts-ignore
+    window.getLinkContent = function(element: Element, selector: string | null, attribute: string | null): string {
+      if (!selector && !attribute) return '';
+      
+      try {
+        if (selector && !attribute) {
+          const link = element.querySelector(selector) as HTMLAnchorElement;
+          return link?.href || '';
+        }
+        
+        if (attribute) {
+          const foundElement = selector ? element.querySelector(selector) : element;
+          return foundElement?.getAttribute(attribute)?.trim() || '';
+        }
+      } catch (error) {
+        console.error('Error in getLinkContent:', error);
+        return '';
+      }
+      
+      return '';
+    };
+
+    // helper function to get the URL of an image
+    // @ts-ignore
+    window.getImageContent = function(element: Element, selector: string | null, attribute: string | null): string {
+      if (!selector && !attribute) return '';
+      
+      try {
+        if (selector && !attribute) {
+          const img = element.querySelector(selector) as HTMLImageElement;
+          // Check both src and data-src attributes
+          return img?.src || img?.getAttribute('data-src') || '';
+        }
+        
+        if (attribute) {
+          const foundElement = selector ? element.querySelector(selector) : element;
+          return foundElement?.getAttribute(attribute)?.trim() || '';
+        }
+      } catch (error) {
+        console.error('Error in getImageContent:', error);
+        return '';
+      }
+      
+      return '';
+    };
+
+    // helper function to format price
+    // it removes all non-numeric characters except commas and periods
+    // and also only returns the first (lower) price
+    // @ts-ignore
+    window.formatPrice = function(price: string): string {
+      if (!price) return '';
+      
+      // Remove all non-numeric characters except commas and periods
+      const cleaned = price.replace(/[^0-9,.]/g, '');
+      
+      // Split by common separators (comma, space, dash, etc.)
+      const prices = cleaned.split(/[, -]/);
+      
+      // Get the first price and remove any remaining commas
+      const firstPrice = prices[0].replace(/,/g, '');
+      
+      // Remove decimal points and everything after them
+      return firstPrice.split('.')[0];
+    };
+  });
 }
 
 // Function to scrape a detail page
@@ -107,7 +170,11 @@ async function scrapeDetailPage(browser: puppeteer.Browser, url: string, data: C
       // Implement rate limiting for detail pages
       await delay(1000);
       
-      console.log(`Scraping detail page (attempt ${retryCount + 1}/${maxRetries}): ${url}`);
+      if (retryCount === 0) {
+        console.log(`Scraping detail page: ${url}`);
+      } else {
+        console.log(`Scraping detail page (attempt ${retryCount + 1}/${maxRetries}): ${url}`);
+      }
       
       // Set a longer timeout (60 seconds instead of 30)
       await page.goto(url, { 
@@ -115,71 +182,7 @@ async function scrapeDetailPage(browser: puppeteer.Browser, url: string, data: C
         timeout: 60000 
       });
       
-      // Define helper functions in the browser context
-      await page.evaluate(() => {
-        // @ts-ignore
-        window.getElementContent = function(element: Element, selector: string | null, attribute: string | null): string {
-          // If no selector or attribute is provided, return empty string
-          if (!selector && !attribute) return '';
-          
-          try {
-            // Only try to querySelector if we have a valid selector
-            const foundElement = selector ? element.querySelector(selector) : element;
-            
-            if (foundElement) {
-              if (attribute) {
-                return foundElement.getAttribute(attribute)?.trim() || '';
-              }
-              return foundElement.textContent?.trim() || '';
-            }
-          } catch (error) {
-            console.error('Error in getElementContent:', error);
-            return '';
-          }
-          
-          return '';
-        };
-
-        // @ts-ignore
-        window.getImageContent = function(element: Element, selector: string | null, attribute: string | null): string {
-          if (!selector && !attribute) return '';
-          
-          try {
-            if (selector && !attribute) {
-              const img = element.querySelector(selector) as HTMLImageElement;
-              // Check both src and data-src attributes
-              return img?.src || img?.getAttribute('data-src') || '';
-            }
-            
-            if (attribute) {
-              const foundElement = selector ? element.querySelector(selector) : element;
-              return foundElement?.getAttribute(attribute)?.trim() || '';
-            }
-          } catch (error) {
-            console.error('Error in getImageContent:', error);
-            return '';
-          }
-          
-          return '';
-        };
-
-        // @ts-ignore
-        window.formatPrice = function(price: string): string {
-          if (!price) return '';
-          
-          // Remove all non-numeric characters except commas and periods
-          const cleaned = price.replace(/[^0-9,.]/g, '');
-          
-          // Split by common separators (comma, space, dash, etc.)
-          const prices = cleaned.split(/[, -]/);
-          
-          // Get the first price and remove any remaining commas
-          const firstPrice = prices[0].replace(/,/g, '');
-          
-          // Remove decimal points and everything after them
-          return firstPrice.split('.')[0];
-        };
-      });
+      await defineBrowserHelpers(page);
 
       const detailData = await page.evaluate((data) => {
         const result: Partial<Results> = {};
@@ -196,10 +199,6 @@ async function scrapeDetailPage(browser: puppeteer.Browser, url: string, data: C
                 selector.selector,
                 selector.selectorIfAttribute
               );
-              console.log(`Debug - Image scraping for ${data.name}:`);
-              console.log(`- Selector: ${selector.selector}`);
-              console.log(`- Found value: ${value}`);
-              console.log(`- Element HTML: ${document.documentElement.innerHTML}`);
             } else {
               value = (window as any).getElementContent(
                 document,
@@ -209,40 +208,13 @@ async function scrapeDetailPage(browser: puppeteer.Browser, url: string, data: C
             }
 
             // Map the selector key to the corresponding Results field
-            switch (key) {
-              case 'listingTitle':
-                result.title = value;
-                break;
-              case 'listingDescription':
-                result.description = value;
-                break;
-              case 'listingPrice':
-                result.price = (window as any).formatPrice(value);
-                break;
-              case 'listingSalePrice':
-                result.sale_price = (window as any).formatPrice(value);
-                break;
-              case 'listingImage':
-                result.image_link = value;
-                break;
-              case 'listingImageTag':
-                result.image_tag = value;
-                break;
-              case 'listingAddress':
-                result.address = value;
-                break;
-              case 'listingCity':
-                result.city = value;
-                break;
-              case 'listingLatitude':
-                result.latitude = value;
-                break;
-              case 'listingLongitude':
-                result.longitude = value;
-                break;
-              case 'listingNeighborhood':
-                result.neighborhood = value;
-                break;
+            const field = (window as any).selectorToFieldMap[key];
+            if (field) {
+              if (key === 'listingPrice' || key === 'listingSalePrice') {
+                (result as any)[field] = (window as any).formatPrice(value);
+              } else {
+                (result as any)[field] = value;
+              }
             }
           }
         });
@@ -298,92 +270,7 @@ export async function scrapeListings(data: ClientDataType): Promise<Scraper> {
     await page.goto(data.listingsUrl, { waitUntil: 'networkidle2' });
     await page.waitForSelector(data.elementSelectors.listingsPageContainer.selector, { visible: true });
     
-    // Define helper functions in the browser context
-    await page.evaluate(() => {
-      // @ts-ignore
-      window.getElementContent = function(element: Element, selector: string | null, attribute: string | null): string {
-        if (!selector && !attribute) return '';
-        
-        try {
-          // Only try to querySelector if we have a valid selector
-          const foundElement = selector ? element.querySelector(selector) : element;
-          
-          if (foundElement) {
-            if (attribute) {
-              return foundElement.getAttribute(attribute)?.trim() || '';
-            }
-            return foundElement.textContent?.trim() || '';
-          }
-        } catch (error) {
-          console.error('Error in getElementContent:', error);
-          return '';
-        }
-        
-        return '';
-      };
-
-      // @ts-ignore
-      window.getLinkContent = function(element: Element, selector: string | null, attribute: string | null): string {
-        if (!selector && !attribute) return '';
-        
-        try {
-          if (selector && !attribute) {
-            const link = element.querySelector(selector) as HTMLAnchorElement;
-            return link?.href || '';
-          }
-          
-          if (attribute) {
-            const foundElement = selector ? element.querySelector(selector) : element;
-            return foundElement?.getAttribute(attribute)?.trim() || '';
-          }
-        } catch (error) {
-          console.error('Error in getLinkContent:', error);
-          return '';
-        }
-        
-        return '';
-      };
-
-      // @ts-ignore
-      window.getImageContent = function(element: Element, selector: string | null, attribute: string | null): string {
-        if (!selector && !attribute) return '';
-        
-        try {
-          if (selector && !attribute) {
-            const img = element.querySelector(selector) as HTMLImageElement;
-            // Check both src and data-src attributes
-            return img?.src || img?.getAttribute('data-src') || '';
-          }
-          
-          if (attribute) {
-            const foundElement = selector ? element.querySelector(selector) : element;
-            return foundElement?.getAttribute(attribute)?.trim() || '';
-          }
-        } catch (error) {
-          console.error('Error in getImageContent:', error);
-          return '';
-        }
-        
-        return '';
-      };
-
-      // @ts-ignore
-      window.formatPrice = function(price: string): string {
-        if (!price) return '';
-        
-        // Remove all non-numeric characters except commas and periods
-        const cleaned = price.replace(/[^0-9,.]/g, '');
-        
-        // Split by common separators (comma, space, dash, etc.)
-        const prices = cleaned.split(/[, -]/);
-        
-        // Get the first price and remove any remaining commas
-        const firstPrice = prices[0].replace(/,/g, '');
-        
-        // Remove decimal points and everything after them
-        return firstPrice.split('.')[0];
-      };
-    });
+    await defineBrowserHelpers(page);
     
     // Get initial data from listings page
     const listingsData = await page.evaluate((data) => {    
@@ -413,11 +300,6 @@ export async function scrapeListings(data: ClientDataType): Promise<Scraper> {
                 selector.selectorIfAttribute
               );
             } else if (key === 'listingImage') {
-              const debugInfo = {
-                selector: selector.selector,
-                elementHtml: el.innerHTML,
-                foundElements: Array.from(el.querySelectorAll(selector.selector || '')).length
-              };
               value = (window as any).getImageContent(
                 el,
                 selector.selector,
@@ -432,43 +314,13 @@ export async function scrapeListings(data: ClientDataType): Promise<Scraper> {
             }
 
             // Map the selector key to the corresponding Results field
-            switch (key) {
-              case 'listingTitle':
-                result.title = value;
-                break;
-              case 'listingDescription':
-                result.description = value;
-                break;
-              case 'listingPrice':
-                result.price = (window as any).formatPrice(value);
-                break;
-              case 'listingSalePrice':
-                result.sale_price = (window as any).formatPrice(value);
-                break;
-              case 'listingImage':
-                result.image_link = value;
-                break;
-              case 'listingImageTag':
-                result.image_tag = value;
-                break;
-              case 'listingAddress':
-                result.address = value;
-                break;
-              case 'listingCity':
-                result.city = value;
-                break;
-              case 'listingLatitude':
-                result.latitude = value;
-                break;
-              case 'listingLongitude':
-                result.longitude = value;
-                break;
-              case 'listingNeighborhood':
-                result.neighborhood = value;
-                break;
-              case 'listingDetailPageUrl':
-                result.link = value;
-                break;
+            const field = (window as any).selectorToFieldMap[key];
+            if (field) {
+              if (key === 'listingPrice' || key === 'listingSalePrice') {
+                (result as any)[field] = (window as any).formatPrice(value);
+              } else {
+                (result as any)[field] = value;
+              }
             }
           }
         });
@@ -496,8 +348,6 @@ export async function scrapeListings(data: ClientDataType): Promise<Scraper> {
         return listing;
       })
     );
-
-    console.log('Final listings with detail data:', listingsWithDetails.length);
     
     // Cache the results
     cache.setCachedData(data, listingsWithDetails);
