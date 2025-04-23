@@ -81,6 +81,141 @@
           "selector": null,
           "selectorIfAttribute": null,
           "getDataFromDetailsPage": false
+        },
+        "listingLoyaltyProgram": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingMarginLevel": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingStarRating": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingAddress2": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingAddress3": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingPostalCode": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingUnitNumber": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingPriority": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingNumberOfRooms": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingAndroidAppName": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingAndroidAppPackage": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingAndroidAppUrl": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIosAppName": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIosAppStoreId": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIosUrl": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIpadAppName": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIpadAppStoreId": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIpadAppUrl": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIphoneAppName": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIphoneAppStoreId": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIphoneAppUrl": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingWindowsPhoneAppId": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingWindowsPhoneAppName": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingWindowsPhoneUrl": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingVideoUrl": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingVideoTag": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingCategory": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         }
       }
     },
@@ -162,6 +297,141 @@
           "getDataFromDetailsPage": false
         },
         "listingRegion": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingLoyaltyProgram": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingMarginLevel": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingStarRating": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingAddress2": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingAddress3": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingPostalCode": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingUnitNumber": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingPriority": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingNumberOfRooms": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingAndroidAppName": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingAndroidAppPackage": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingAndroidAppUrl": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIosAppName": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIosAppStoreId": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIosUrl": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIpadAppName": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIpadAppStoreId": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIpadAppUrl": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIphoneAppName": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIphoneAppStoreId": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIphoneAppUrl": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingWindowsPhoneAppId": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingWindowsPhoneAppName": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingWindowsPhoneUrl": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingVideoUrl": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingVideoTag": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingCategory": {
           "selector": null,
           "selectorIfAttribute": null,
           "getDataFromDetailsPage": false
@@ -249,6 +519,141 @@
           "selector": null,
           "selectorIfAttribute": null,
           "getDataFromDetailsPage": false
+        },
+        "listingLoyaltyProgram": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingMarginLevel": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingStarRating": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingAddress2": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingAddress3": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingPostalCode": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingUnitNumber": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingPriority": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingNumberOfRooms": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingAndroidAppName": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingAndroidAppPackage": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingAndroidAppUrl": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIosAppName": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIosAppStoreId": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIosUrl": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIpadAppName": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIpadAppStoreId": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIpadAppUrl": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIphoneAppName": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIphoneAppStoreId": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIphoneAppUrl": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingWindowsPhoneAppId": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingWindowsPhoneAppName": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingWindowsPhoneUrl": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingVideoUrl": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingVideoTag": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingCategory": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
         }
       }
     },
@@ -269,18 +674,23 @@
           "selectorIfAttribute": null,
           "getDataFromDetailsPage": false
         },
-        "listingTitle": {
-          "selector": "h4 a",
+        "listingDetailContainer": {
+          "selector": "main article",
           "selectorIfAttribute": null,
-          "getDataFromDetailsPage": false
+          "getDataFromDetailsPage": true
+        },
+        "listingTitle": {
+          "selector": ".field-name-title",
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": true
         },
         "listingDescription": {
-          "selector": "unknown",
+          "selector": ".field-name-body",
           "selectorIfAttribute": null,
-          "getDataFromDetailsPage": false
+          "getDataFromDetailsPage": true
         },
         "listingPrice": {
-          "selector": "unknown",
+          "selector": null,
           "selectorIfAttribute": null,
           "getDataFromDetailsPage": false
         },
@@ -295,9 +705,9 @@
           "getDataFromDetailsPage": false
         },
         "listingCity": {
-          "selector": "div.wrapper-hoodarea",
+          "selector": ".rc-core-cat-streamline_locarea",
           "selectorIfAttribute": null,
-          "getDataFromDetailsPage": false
+          "getDataFromDetailsPage": true
         },
         "listingImageTag": {
           "selector": null,
@@ -325,6 +735,141 @@
           "getDataFromDetailsPage": false
         },
         "listingRegion": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingLoyaltyProgram": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingMarginLevel": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingStarRating": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingAddress2": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingAddress3": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingPostalCode": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingUnitNumber": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingPriority": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingNumberOfRooms": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingAndroidAppName": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingAndroidAppPackage": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingAndroidAppUrl": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIosAppName": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIosAppStoreId": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIosUrl": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIpadAppName": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIpadAppStoreId": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIpadAppUrl": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIphoneAppName": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIphoneAppStoreId": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingIphoneAppUrl": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingWindowsPhoneAppId": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingWindowsPhoneAppName": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingWindowsPhoneUrl": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingVideoUrl": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingVideoTag": {
+          "selector": null,
+          "selectorIfAttribute": null,
+          "getDataFromDetailsPage": false
+        },
+        "listingCategory": {
           "selector": null,
           "selectorIfAttribute": null,
           "getDataFromDetailsPage": false
