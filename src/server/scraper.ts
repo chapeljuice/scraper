@@ -245,6 +245,8 @@ async function scrapeDetailPage(browser: puppeteer.Browser, url: string, data: C
         // Return empty result after all retries fail
         return {};
       }
+    } finally {
+      await page.close();
     }
   }
   
@@ -357,11 +359,18 @@ export async function scrapeListings(data: ClientDataType): Promise<Scraper> {
     
     // Cache the results
     cache.setCachedData(data, listingsWithDetails);
+    await page.close();
     return listingsWithDetails;
   } catch (error) {
     console.error(`Error scraping ${data.name}:`, error);
     throw error;
   } finally {
+    // check to see if there are any pages open and close them first
+    const pages = await browser.pages();
+    for (let i = 0; i < pages.length; i++) {
+        await pages[i].close();
+    }
+    // then close the browser
     await browser.close();
   }
 }
