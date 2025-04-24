@@ -39,7 +39,7 @@ const findObjectWithValue = (
   return array.find(obj => obj[key] === value);
 };
 
-export async function updateSheet(clientIds: string[]) {
+export async function updateSheet(clientIds: string[], onProgress?: (clientId: string, message: string, progress?: number) => void) {
   // Check if the clientIds array is empty
   if (clientIds.length === 0) {
     console.log('No client IDs provided. Exiting...');
@@ -55,8 +55,10 @@ export async function updateSheet(clientIds: string[]) {
   let sheetIdToUpdate = '';
   let listingsToUpdate: GenericObject[] = [];
   // loop through the array of selected clients in the JSON file and scrape each URL
-  for (const client of selectedClientData) {
+  for (const [index, client] of selectedClientData.entries()) {
+    onProgress?.(client.id, `Starting to scrape ${client.name}...`, (index / selectedClientData.length) * 100);
     const listings = await scrapeListings(client);
+    onProgress?.(client.id, `Scraped ${listings.length} listings for ${client.name}`, ((index + 0.5) / selectedClientData.length) * 100);
     console.log(`Scraped listings for ${client.name}`);
     console.log(`Number of listings found: ${listings.length}`);
     listingsToUpdate.push(...listings);
@@ -65,6 +67,7 @@ export async function updateSheet(clientIds: string[]) {
     } else {
       sheetIdToUpdate = process?.env?.GOOGLE_SHEET_ID || '';
     }
+    onProgress?.(client.id, `Processing data for ${client.name}...`, ((index + 0.75) / selectedClientData.length) * 100);
   }
 
   const rows = listingsToUpdate.map(listing => ([
@@ -160,6 +163,7 @@ export async function updateSheet(clientIds: string[]) {
 
   try {
     // Clear the existing data in the sheet
+    onProgress?.('all', 'Clearing existing data from sheet...', 90);
     await sheets.spreadsheets.values.clear({
       spreadsheetId: sheetIdToUpdate,
       range: 'A2:AR'
@@ -169,6 +173,8 @@ export async function updateSheet(clientIds: string[]) {
     const chunkSize = 1000; // Number of rows to insert at once
     for (let i = 0; i < rows.length; i += chunkSize) {
       const chunk = rows.slice(i, i + chunkSize);
+      const progress = 90 + ((i / rows.length) * 10);
+      onProgress?.('all', `Updating sheet with new data (${i + chunk.length}/${rows.length} rows)...`, progress);
       
       // Update the sheet with new data
       await sheets.spreadsheets.values.update({
@@ -180,8 +186,10 @@ export async function updateSheet(clientIds: string[]) {
         }
       });
     }
+    onProgress?.('all', 'Sheet updated successfully!', 100);
     console.log('Sheet(s) updated successfully!');
   } catch (err) {
     console.error('Error updating sheet:', err);
+    onProgress?.('all', 'Error updating sheet: ' + (err as Error).message, 100);
   }
 }

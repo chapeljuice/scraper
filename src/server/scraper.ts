@@ -251,8 +251,8 @@ async function scrapeDetailPage(browser: puppeteer.Browser, url: string, data: C
 
 export async function scrapeListings(data: ClientDataType): Promise<Scraper> {
   const browser = await puppeteer.launch({
-    headless: true,
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    headless: true
   });
   const page = await browser.newPage();
 

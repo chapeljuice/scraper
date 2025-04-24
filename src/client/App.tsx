@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Select from 'react-select';
 import "./App.css";
 import data from '../client/data/client-structures.json';
@@ -8,16 +8,34 @@ interface ClientOption {
   label: string;
 }
 
+interface ProgressMessage {
+  type: string;
+  message: string;
+  progress?: number;
+}
+
 function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedOptions, setSelectedOptions] = useState<ClientOption[]>([]);
+  const [progressMessage, setProgressMessage] = useState<string>('');
+  const [progressPercent, setProgressPercent] = useState<number>(0);
+  const [eventSource, setEventSource] = useState<EventSource | null>(null);
 
   const clientOptions: ClientOption[] = data.clients.map(client => ({
     value: client.id,
     label: client.name
   }));
+
+  // Clean up event source on unmount
+  useEffect(() => {
+    return () => {
+      if (eventSource) {
+        eventSource.close();
+      }
+    };
+  }, [eventSource]);
 
   const handleSelectChange = (selected: readonly ClientOption[]) => {
     setIsLoading(false);
@@ -42,6 +60,8 @@ function App() {
     setIsLoading(true);
     setSuccess(false);
     setError(null);
+    setProgressMessage('Initializing...');
+    setProgressPercent(0);
 
     if (selectedOptions.length < 1) {
       setError('Please select at least one client.');
@@ -56,21 +76,56 @@ function App() {
         },
         body: JSON.stringify({ selectedOptions: selectedOptions.map(option => option.value) }),
       });
+      
       if (!response.ok) {
-        console.log({response});
         throw new Error('Network response was not ok');
       }
+      
       const data = await response.json();
-      console.log('Scraping started:', data);
-      setSuccess(true)
+      const sessionId = data.sessionId;
+
+      // Close any existing event source
+      if (eventSource) {
+        eventSource.close();
+      }
+
+      // Set up event source for progress updates
+      const newEventSource = new EventSource(`/scrape-progress?clientId=${sessionId}`);
+      setEventSource(newEventSource);
+
+      newEventSource.onmessage = (event) => {
+        const progressData: ProgressMessage = JSON.parse(event.data);
+        if (progressData.type === 'progress') {
+          setProgressMessage(progressData.message);
+          if (progressData.progress !== undefined) {
+            setProgressPercent(progressData.progress);
+          }
+          // Only set success when we reach 100% progress
+          if (progressData.progress === 100) {
+            setSuccess(true);
+            setIsLoading(false);
+            newEventSource.close();
+            setEventSource(null);
+          }
+        }
+      };
+
+      newEventSource.onerror = (error) => {
+        console.error('EventSource error:', error);
+        setError('Connection to progress updates lost. The process may still be running.');
+        newEventSource.close();
+        setEventSource(null);
+      };
+
     }
     catch (error) {
       console.error('Error during scraping:', error);
       setError('An error occurred while scraping. Please try again.');
-    }
-    finally {
       setIsLoading(false);
-      setSelectedOptions([]);
+      if (eventSource) {
+        eventSource.close();
+        setEventSource(null);
+      }
     }
   }
 
@@ -114,6 +169,12 @@ function App() {
               isLoading && <div className="spinner"></div>
             }
           </button>
+          {isLoading && (
+            <div className="progress-container">
+              <div className="progress-bar" style={{ width: `${progressPercent}%` }}></div>
+              <p id="progressMessage" className="progress-message">{progressMessage}</p>
+            </div>
+          )}
         </div>
       </div>
       {error && <p className="error">{error}</p>}
