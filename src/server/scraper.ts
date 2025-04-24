@@ -267,7 +267,10 @@ export async function scrapeListings(data: ClientDataType): Promise<Scraper> {
     // Implement rate limiting
     await delay(1000); // 1 second delay between requests
     
-    await page.goto(data.listingsUrl, { waitUntil: 'networkidle2' });
+    await page.goto(data.listingsUrl, {
+      waitUntil: 'networkidle2',
+      timeout: 60000
+    });
     await page.waitForSelector(data.elementSelectors.listingsPageContainer.selector, { visible: true });
     
     await defineBrowserHelpers(page);
