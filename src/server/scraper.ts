@@ -255,14 +255,38 @@ async function scrapeDetailPage(browser: puppeteer.Browser, url: string, data: C
 
 export async function scrapeListings(data: ClientDataType): Promise<Scraper> {
   const browser = await puppeteer.launch({
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    headless: true
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage', // Overcome limited resource problems
+      '--disable-gpu', // Applicable to Windows systems only
+      '--disable-software-rasterizer'
+    ],
+    headless: true,
+    timeout: 30000 // 30 second timeout for browser launch
   });
+  
   const page = await browser.newPage();
-
+  
+  // Set default timeout for page operations
+  page.setDefaultTimeout(120000); // 2 minutes
+  
+  // Set viewport to a reasonable size
+  await page.setViewport({ width: 1280, height: 800 });
+  
   // Listen to console events
   page.on('console', msg => {
     console.log('Browser console:', msg.text());
+  });
+  
+  // Listen to page errors
+  page.on('error', err => {
+    console.error('Page error:', err);
+  });
+  
+  // Listen to request failures
+  page.on('requestfailed', request => {
+    console.error('Request failed:', request.url(), request.failure()?.errorText);
   });
 
   try {
@@ -380,8 +404,8 @@ export async function scrapeMultipleClients(clients: ClientDataType[]): Promise<
   const results: Scraper[] = [];
   const errors: Error[] = [];
   
-  // Process clients in parallel with a concurrency limit
-  const concurrencyLimit = 3;
+  // Reduce concurrency for production
+  const concurrencyLimit = process.env.NODE_ENV === 'production' ? 1 : 3;
   const chunks = [];
   
   for (let i = 0; i < clients.length; i += concurrencyLimit) {
@@ -392,7 +416,13 @@ export async function scrapeMultipleClients(clients: ClientDataType[]): Promise<
     const chunkResults = await Promise.all(
       chunk.map(async (client) => {
         try {
-          return await scrapeListings(client);
+          // Add a timeout for the entire scraping process
+          return await Promise.race<Scraper>([
+            scrapeListings(client),
+            new Promise<Scraper>((_, reject) => 
+              setTimeout(() => reject(new Error('Scraping timeout')), 300000) // 5 minutes timeout
+            )
+          ]);
         } catch (error) {
           console.error(`Failed to scrape ${client.name}:`, error);
           errors.push(error as Error);
@@ -403,9 +433,10 @@ export async function scrapeMultipleClients(clients: ClientDataType[]): Promise<
     
     results.push(...chunkResults);
     
-    // Add delay between chunks to prevent overwhelming servers
+    // Increase delay between chunks in production
+    const delayTime = process.env.NODE_ENV === 'production' ? 5000 : 2000;
     if (chunks.indexOf(chunk) < chunks.length - 1) {
-      await delay(2000); // 2 second delay between chunks
+      await delay(delayTime);
     }
   }
   
