@@ -181,6 +181,8 @@ async function scrapeDetailPage(browser: puppeteer.Browser, url: string, data: C
         waitUntil: 'networkidle2',
         timeout: 120000 
       });
+
+      await page.waitForSelector(data.elementSelectors.listingDetailContainer.selector, { visible: true });
       
       await defineBrowserHelpers(page);
 
