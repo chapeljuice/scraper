@@ -176,10 +176,10 @@ async function scrapeDetailPage(browser: puppeteer.Browser, url: string, data: C
         console.log(`Scraping detail page (attempt ${retryCount + 1}/${maxRetries}): ${url}`);
       }
       
-      // Set a longer timeout (60 seconds instead of 30)
+      // Set a longer timeout (120 seconds instead of 30)
       await page.goto(url, { 
         waitUntil: 'networkidle2',
-        timeout: 60000 
+        timeout: 120000 
       });
       
       await defineBrowserHelpers(page);
@@ -267,9 +267,10 @@ export async function scrapeListings(data: ClientDataType): Promise<Scraper> {
     // Implement rate limiting
     await delay(1000); // 1 second delay between requests
     
+    // Set a longer timeout (120 seconds instead of 30)
     await page.goto(data.listingsUrl, {
       waitUntil: 'networkidle2',
-      timeout: 60000
+      timeout: 120000
     });
     await page.waitForSelector(data.elementSelectors.listingsPageContainer.selector, { visible: true });
     
