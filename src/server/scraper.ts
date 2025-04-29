@@ -161,7 +161,7 @@ async function defineBrowserHelpers(page: puppeteer.Page) {
 
 // Function to scrape a detail page
 async function scrapeDetailPage(browser: puppeteer.Browser, url: string, data: ClientDataType): Promise<Partial<Results>> {
-  const page = await browser.newPage();
+  let page: puppeteer.Page | null = null;
   const maxRetries = 3;
   let retryCount = 0;
   
@@ -175,6 +175,9 @@ async function scrapeDetailPage(browser: puppeteer.Browser, url: string, data: C
       } else {
         console.log(`Scraping detail page (attempt ${retryCount + 1}/${maxRetries}): ${url}`);
       }
+      
+      // Create a new page for each attempt
+      page = await browser.newPage();
       
       // Set a longer timeout (120 seconds instead of 30)
       await page.goto(url, { 
@@ -224,7 +227,6 @@ async function scrapeDetailPage(browser: puppeteer.Browser, url: string, data: C
         return result;
       }, data);
 
-      await page.close();
       return detailData;
     } catch (error) {
       retryCount++;
@@ -239,14 +241,21 @@ async function scrapeDetailPage(browser: puppeteer.Browser, url: string, data: C
       }
       
       console.error(`Error scraping detail page ${url}:`, error);
-      await page.close();
       
       if (retryCount === maxRetries) {
         // Return empty result after all retries fail
         return {};
       }
     } finally {
-      await page.close();
+      // Safely close the page if it exists
+      if (page) {
+        try {
+          await page.close();
+        } catch (error) {
+          console.warn('Error closing page:', error);
+        }
+        page = null;
+      }
     }
   }
   
