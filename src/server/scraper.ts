@@ -179,13 +179,46 @@ async function scrapeDetailPage(browser: puppeteer.Browser, url: string, data: C
       // Create a new page for each attempt
       page = await browser.newPage();
       
+      // Block unnecessary resources
+      await page.setRequestInterception(true);
+      page.on('request', (request) => {
+        const resourceType = request.resourceType();
+        const url = request.url();
+        
+        // Block analytics, ads, and other unnecessary resources
+        if (
+          resourceType === 'image' ||
+          resourceType === 'media' ||
+          resourceType === 'font' ||
+          resourceType === 'other' ||
+          url.includes('analytics') ||
+          url.includes('analytics') ||
+          url.includes('fonts.gstatic') ||
+          url.includes('google-analytics') ||
+          url.includes('googletagmanager') ||
+          url.includes('maps.gstatic') ||
+          url.includes('doubleclick') ||
+          url.includes('facebook') ||
+          url.includes('twitter') ||
+          url.includes('linkedin')
+        ) {
+          request.abort();
+        } else {
+          request.continue();
+        }
+      });
+      
       // Set a longer timeout (120 seconds instead of 30)
       await page.goto(url, { 
-        waitUntil: 'networkidle2',
+        waitUntil: 'networkidle0', // Changed to networkidle0 for better stability
         timeout: 120000 
       });
 
-      await page.waitForSelector(data.elementSelectors.listingDetailContainer.selector, { visible: true });
+      // Wait for the main content to be visible
+      await page.waitForSelector(data.elementSelectors.listingDetailContainer.selector, { 
+        visible: true,
+        timeout: 30000 
+      });
       
       await defineBrowserHelpers(page);
 
@@ -267,48 +300,96 @@ export async function scrapeListings(data: ClientDataType): Promise<Scraper> {
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage', // Overcome limited resource problems
-      '--disable-gpu', // Applicable to Windows systems only
-      '--disable-software-rasterizer'
+      '--disable-dev-shm-usage',
+      '--disable-gpu',
+      '--disable-software-rasterizer',
+      '--disable-extensions',
+      '--disable-notifications',
+      '--disable-popup-blocking',
+      '--disable-infobars',
+      '--disable-web-security',
+      '--disable-features=IsolateOrigins,site-per-process',
+      '--js-flags=--expose-gc',
+      '--single-process',
+      '--no-zygote',
+      '--no-first-run',
+      '--disable-background-timer-throttling',
+      '--disable-backgrounding-occluded-windows',
+      '--disable-renderer-backgrounding'
     ],
     headless: true,
-    timeout: 30000 // 30 second timeout for browser launch
+    timeout: 30000
   });
   
-  const page = await browser.newPage();
-  
-  // Set default timeout for page operations
-  page.setDefaultTimeout(120000); // 2 minutes
-  
-  // Set viewport to a reasonable size
-  await page.setViewport({ width: 1280, height: 800 });
-  
-  // Listen to console events
-  page.on('console', msg => {
-    console.log('Browser console:', msg.text());
-  });
-  
-  // Listen to page errors
-  page.on('error', err => {
-    console.error('Page error:', err);
-  });
-  
-  // Listen to request failures
-  page.on('requestfailed', request => {
-    console.error('Request failed:', request.url(), request.failure()?.errorText);
-  });
-
   try {
     console.log(`Scraping listings from: ${data.listingsUrl}`);
     
+    const page = await browser.newPage();
+    
+    // Block unnecessary resources
+    await page.setRequestInterception(true);
+    page.on('request', (request) => {
+      const resourceType = request.resourceType();
+      const url = request.url();
+      
+      // Block analytics, ads, and other unnecessary resources
+      if (
+        resourceType === 'image' ||
+        resourceType === 'media' ||
+        resourceType === 'font' ||
+        resourceType === 'other' ||
+        url.includes('analytics') ||
+        url.includes('analytics') ||
+        url.includes('fonts.gstatic') ||
+        url.includes('google-analytics') ||
+        url.includes('googletagmanager') ||
+        url.includes('maps.gstatic') ||
+        url.includes('doubleclick') ||
+        url.includes('facebook') ||
+        url.includes('twitter') ||
+        url.includes('linkedin')
+      ) {
+        request.abort();
+      } else {
+        request.continue();
+      }
+    });
+    
+    // Set default timeout for page operations
+    page.setDefaultTimeout(120000);
+    
+    // Set viewport to a reasonable size
+    await page.setViewport({ width: 1280, height: 800 });
+    
+    // Listen to console events
+    page.on('console', msg => {
+      console.log('Browser console:', msg.text());
+    });
+    
+    // Listen to page errors
+    page.on('error', err => {
+      console.error('Page error:', err);
+    });
+    
+    // Listen to request failures
+    page.on('requestfailed', request => {
+      console.error('Request failed:', request.url(), request.failure()?.errorText);
+    });
+    
+    // Listen to page crashes
+    page.on('close', () => {
+      console.warn('Page was closed unexpectedly');
+    });
+
     // Implement rate limiting
     await delay(1000); // 1 second delay between requests
     
     // Set a longer timeout (120 seconds instead of 30)
     await page.goto(data.listingsUrl, {
-      waitUntil: 'networkidle2',
+      waitUntil: 'networkidle0',
       timeout: 120000
     });
+    
     await page.waitForSelector(data.elementSelectors.listingsPageContainer.selector, { visible: true });
     
     await defineBrowserHelpers(page);
@@ -374,37 +455,41 @@ export async function scrapeListings(data: ClientDataType): Promise<Scraper> {
 
     console.log('Initial listings data scraped:', listingsData.length);
     
-    // Scrape detail pages for listings that need additional data
-    const listingsWithDetails = await Promise.all(
-      listingsData.map(async (listing) => {
-        if (listing.link) {
-          try {
-            const detailData = await scrapeDetailPage(browser, listing.link, data);
-            return { ...listing, ...detailData };
-          } catch (error) {
-            console.error(`Failed to scrape detail page ${listing.link}:`, error);
-            return listing;
-          }
+    // Process detail pages sequentially
+    const listingsWithDetails: Scraper = [];
+    for (const listing of listingsData) {
+      if (listing.link) {
+        try {
+          const detailData = await scrapeDetailPage(browser, listing.link, data);
+          listingsWithDetails.push({ ...listing, ...detailData });
+          // Add delay between detail page requests
+          await delay(2000);
+        } catch (error) {
+          console.error(`Failed to scrape detail page ${listing.link}:`, error);
+          // Add the listing without detail data
+          listingsWithDetails.push(listing);
         }
-        return listing;
-      })
-    );
+      } else {
+        listingsWithDetails.push(listing);
+      }
+    }
     
     // Cache the results
     cache.setCachedData(data, listingsWithDetails);
-    await page.close();
     return listingsWithDetails;
   } catch (error) {
     console.error(`Error scraping ${data.name}:`, error);
     throw error;
   } finally {
-    // check to see if there are any pages open and close them first
-    const pages = await browser.pages();
-    for (let i = 0; i < pages.length; i++) {
-        await pages[i].close();
+    try {
+      // Close all pages first
+      const pages = await browser.pages();
+      await Promise.all(pages.map(page => page.close().catch(e => console.warn('Error closing page:', e))));
+      // Then close the browser
+      await browser.close();
+    } catch (error) {
+      console.error('Error during browser cleanup:', error);
     }
-    // then close the browser
-    await browser.close();
   }
 }
 
