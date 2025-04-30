@@ -22,6 +22,7 @@ function App() {
   const [progressMessage, setProgressMessage] = useState<string>('');
   const [progressPercent, setProgressPercent] = useState<number>(0);
   const [eventSource, setEventSource] = useState<EventSource | null>(null);
+  const [failedClients, setFailedClients] = useState<string[]>([]);
 
   const clientOptions: ClientOption[] = data.clients.map(client => ({
     value: client.id,
@@ -40,6 +41,8 @@ function App() {
   const handleSelectChange = (selected: readonly ClientOption[]) => {
     setIsLoading(false);
     setSuccess(false);
+    setError(null);
+    setFailedClients([]);
     
     // Check if the last selected option was "Select All" or "Clear All"
     const lastSelected = selected[selected.length - 1];
@@ -56,10 +59,25 @@ function App() {
     }
   }
 
+  const parseMessageForFailedClients = (message: string) => {
+    // Look for patterns like "X client(s) could not be scraped: Client1, Client2."
+    const failedClientsMatch = message.match(/client\(s\) could not be scraped: (.*?)\./) || 
+                               message.match(/Failed clients: (.*?)\./) ||
+                               message.match(/All clients failed: (.*)/);
+    
+    if (failedClientsMatch && failedClientsMatch[1]) {
+      const clientsList = failedClientsMatch[1].split(', ');
+      setFailedClients(clientsList);
+      return true;
+    }
+    return false;
+  };
+
   const handleButtonClick = async () => {
     setIsLoading(true);
     setSuccess(false);
     setError(null);
+    setFailedClients([]);
     setProgressMessage('Initializing...');
     setProgressPercent(0);
 
@@ -100,9 +118,32 @@ function App() {
           if (progressData.progress !== undefined) {
             setProgressPercent(progressData.progress);
           }
+          
+          // Check if the message contains information about failed clients
+          if (progressData.message.includes('client(s) could not be scraped') || 
+              progressData.message.includes('Failed clients:') ||
+              progressData.message.includes('All clients failed:')) {
+            
+            // Extract the failed client names
+            const failedClientsMatch = progressData.message.match(/client\(s\) could not be scraped: (.*?)\./) || 
+                                      progressData.message.match(/Failed clients: (.*?)\./) ||
+                                      progressData.message.match(/All clients failed: (.*)/);
+            
+            if (failedClientsMatch && failedClientsMatch[1]) {
+              const clientsList = failedClientsMatch[1].split(', ');
+              setFailedClients(clientsList);
+              
+              // Set the error message immediately when we detect failed clients
+              setError(`Some clients failed to scrape: ${clientsList.join(', ')}. Data for successful clients has been written to their respective sheets.`);
+            }
+          }
+          
           // Only set success when we reach 100% progress
           if (progressData.progress === 100) {
-            setSuccess(true);
+            // If there were failed clients, we've already set the error
+            if (failedClients.length === 0 && !progressData.message.includes('failed')) {
+              setSuccess(true);
+            }
             setIsLoading(false);
             newEventSource.close();
             setEventSource(null);
@@ -178,6 +219,11 @@ function App() {
         </div>
       </div>
       {error && <p className="error">{error}</p>}
+      {failedClients.length > 0 && !error && (
+        <p className="error">
+          Warning: The following clients failed to scrape: {failedClients.join(', ')}
+        </p>
+      )}
     </div>
   );
 }

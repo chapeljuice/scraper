@@ -23,9 +23,9 @@
           "getDataFromDetailsPage": true
         },
         "listingTitle": {
-          "selector": ".property-name",
+          "selector": ".results-list-property-title h3",
           "selectorIfAttribute": null,
-          "getDataFromDetailsPage": true
+          "getDataFromDetailsPage": false
         },
         "listingDescription": {
           "selector": "#descBlock",

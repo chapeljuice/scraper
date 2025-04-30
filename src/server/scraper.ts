@@ -214,16 +214,32 @@ async function scrapeDetailPage(browser: puppeteer.Browser, url: string, data: C
         timeout: 120000 
       });
 
-      // Wait for the main content to be visible
+      // Wait for the main content to be visible with a longer timeout
       await page.waitForSelector(data.elementSelectors.listingDetailContainer.selector, { 
         visible: true,
-        timeout: 30000 
+        timeout: 60000 // Increased from 30s to 60s
       });
+      
+      // Small delay to ensure page is fully loaded
+      await delay(1000);
       
       await defineBrowserHelpers(page);
 
+      // First, verify if our selector actually exists on the page
+      const containerExists = await page.evaluate((selector) => {
+        return !!document.querySelector(selector);
+      }, data.elementSelectors.listingDetailContainer.selector);
+      
+      if (!containerExists) {
+        console.error(`Listing detail container selector not found on page: ${url}`);
+        throw new Error(`Listing container not found on detail page`);
+      }
+
       const detailData = await page.evaluate((data) => {
         const result: Partial<Results> = {};
+
+        // Debug helper to log selector status
+        const debugSelectors = {};
 
         // Get data from detail page for fields where getDataFromDetailsPage is true
         Object.entries(data.elementSelectors).forEach(([key, selector]) => {
@@ -231,6 +247,15 @@ async function scrapeDetailPage(browser: puppeteer.Browser, url: string, data: C
           
           if (selector.getDataFromDetailsPage) {
             let value = '';
+            if (selector.selector === null) {
+              // Skip null selectors
+              return;
+            }
+            
+            // Verify selector exists
+            const selectorExists = !!document.querySelector(selector.selector);
+            (debugSelectors as any)[key] = selectorExists ? 'found' : 'not found';
+            
             if (key === 'listingImage') {
               value = (window as any).getImageContent(
                 document,
@@ -257,8 +282,26 @@ async function scrapeDetailPage(browser: puppeteer.Browser, url: string, data: C
           }
         });
 
+        // Add debug information
+        console.table(debugSelectors);
+        
         return result;
       }, data);
+
+      // Validate that critical fields are present
+      if (data.elementSelectors.listingTitle.getDataFromDetailsPage && !detailData.title) {
+        console.warn(`Title not found in detail page: ${url}, will retry...`);
+        await delay(2000); // Wait a bit before retry
+        retryCount++;
+        continue;
+      }
+      
+      if (data.elementSelectors.listingImage.getDataFromDetailsPage && !detailData.image_link) {
+        console.warn(`Image not found in detail page: ${url}, will retry...`);
+        await delay(2000); // Wait a bit before retry
+        retryCount++;
+        continue;
+      }
 
       return detailData;
     } catch (error) {
@@ -361,11 +404,6 @@ export async function scrapeListings(data: ClientDataType): Promise<Scraper> {
     // Set viewport to a reasonable size
     await page.setViewport({ width: 1280, height: 800 });
     
-    // Listen to console events
-    page.on('console', msg => {
-      console.log('Browser console:', msg.text());
-    });
-    
     // Listen to page errors
     page.on('error', err => {
       console.error('Page error:', err);
@@ -390,7 +428,14 @@ export async function scrapeListings(data: ClientDataType): Promise<Scraper> {
       timeout: 120000
     });
     
-    await page.waitForSelector(data.elementSelectors.listingsPageContainer.selector, { visible: true });
+    // Ensure the listings container exists before proceeding
+    await page.waitForSelector(data.elementSelectors.listingsPageContainer.selector, { 
+      visible: true,
+      timeout: 60000
+    });
+    
+    // Small delay to ensure all dynamic content is loaded
+    await delay(2000);
     
     await defineBrowserHelpers(page);
     
@@ -414,6 +459,10 @@ export async function scrapeListings(data: ClientDataType): Promise<Scraper> {
           if (key === 'listingsPageContainer' || key === 'listingDetailContainer') return;
           
           if (!selector.getDataFromDetailsPage) {
+            if (!selector.selector) {
+              return; // Skip null selectors
+            }
+            
             let value = '';
             if (key === 'listingDetailPageUrl') {
               value = (window as any).getLinkContent(
@@ -446,6 +495,12 @@ export async function scrapeListings(data: ClientDataType): Promise<Scraper> {
             }
           }
         });
+        
+        // Ensure we have a link to scrape details, otherwise skip
+        if (!result.link || result.link === '') {
+          console.warn('Skipping listing - no valid detail page URL found');
+          return;
+        }
 
         results.push(result);
       });
@@ -458,28 +513,63 @@ export async function scrapeListings(data: ClientDataType): Promise<Scraper> {
     // Process detail pages sequentially
     const listingsWithDetails: Scraper = [];
     for (const listing of listingsData) {
-      if (listing.link) {
-        try {
-          const detailData = await scrapeDetailPage(browser, listing.link, data);
-          listingsWithDetails.push({ ...listing, ...detailData });
-          // Add delay between detail page requests
-          await delay(2000);
-        } catch (error) {
-          console.error(`Failed to scrape detail page ${listing.link}:`, error);
-          // Add the listing without detail data
-          listingsWithDetails.push(listing);
+      if (!listing.link) {
+        console.warn('Skipping listing - no detail page URL found');
+        continue;
+      }
+      
+      try {
+        // Make the URL absolute if it's relative
+        let detailUrl = listing.link;
+        if (!/^https?:\/\//i.test(detailUrl)) {
+          const baseURL = new URL(data.listingsUrl);
+          detailUrl = new URL(detailUrl, baseURL.origin).href;
+          listing.link = detailUrl; // Update the link with absolute URL
         }
-      } else {
-        listingsWithDetails.push(listing);
+        
+        const detailData = await scrapeDetailPage(browser, detailUrl, data);
+        
+        // Verify that we have minimum required data
+        const combinedListing = { ...listing, ...detailData };
+        
+        // Ensure we have at least the minimum data (title and link)
+        if (!combinedListing.title) {
+          console.warn(`Skipping listing with missing title: ${detailUrl}`);
+          // If title is expected from detail page but not found, log it
+          if (data.elementSelectors.listingTitle.getDataFromDetailsPage) {
+            console.error(`Failed to get title from detail page: ${detailUrl}`);
+          }
+        }
+        
+        // Add the listing even if some data is missing
+        listingsWithDetails.push(combinedListing);
+        
+        // Add delay between detail page requests
+        await delay(2000);
+      } catch (error) {
+        console.error(`Failed to scrape detail page ${listing.link}:`, error);
+        // Add the listing without detail data if we have at least the basic info
+        if (listing.title || (data.elementSelectors.listingTitle && !data.elementSelectors.listingTitle.getDataFromDetailsPage)) {
+          listingsWithDetails.push(listing);
+        } else {
+          console.warn(`Skipping listing with insufficient data: ${listing.link}`);
+        }
       }
     }
     
     // Cache the results
-    cache.setCachedData(data, listingsWithDetails);
+    if (listingsWithDetails.length > 0) {
+      cache.setCachedData(data, listingsWithDetails);
+      console.log(`Successfully scraped ${listingsWithDetails.length} listings for ${data.name}`);
+    } else {
+      console.error(`No valid listings found for ${data.name}`);
+    }
+    
     return listingsWithDetails;
   } catch (error) {
     console.error(`Error scraping ${data.name}:`, error);
-    throw error;
+    // Return empty array instead of throwing the error
+    return [];
   } finally {
     try {
       // Close all pages first

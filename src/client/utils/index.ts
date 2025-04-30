@@ -53,21 +53,70 @@ export async function updateSheet(clientIds: string[], onProgress?: (clientId: s
   }
   
   let sheetIdToUpdate = '';
-  let listingsToUpdate: GenericObject[] = [];
-  // loop through the array of selected clients in the JSON file and scrape each URL
-  for (const [index, client] of selectedClientData.entries()) {
-    onProgress?.(client.id, `Starting to scrape ${client.name}...`, (index / selectedClientData.length) * 100);
-    const listings = await scrapeListings(client);
-    onProgress?.(client.id, `Scraped ${listings.length} listings for ${client.name}`, ((index + 0.5) / selectedClientData.length) * 100);
-    console.log(`Scraped listings for ${client.name}`);
-    console.log(`Number of listings found: ${listings.length}`);
-    listingsToUpdate.push(...listings);
+  // Get the sheetId from the first client or fallback to env variable
+  for (const client of selectedClientData) {
     if (client.sheetId) {
       sheetIdToUpdate = client.sheetId;
-    } else {
-      sheetIdToUpdate = process?.env?.GOOGLE_SHEET_ID || '';
+      break;
     }
-    onProgress?.(client.id, `Processing data for ${client.name}...`, ((index + 0.75) / selectedClientData.length) * 100);
+  }
+  if (!sheetIdToUpdate) {
+    sheetIdToUpdate = process?.env?.GOOGLE_SHEET_ID || '';
+  }
+  
+  // Clear the sheet at the beginning of the process
+  try {
+    onProgress?.('all', 'Clearing existing data from sheet...', 10);
+    await sheets.spreadsheets.values.clear({
+      spreadsheetId: sheetIdToUpdate,
+      range: 'A2:AR'
+    });
+    console.log('Sheet cleared successfully...');
+  } catch (err) {
+    console.error('Error clearing sheet:', err);
+    onProgress?.('all', 'Error clearing sheet: ' + (err as Error).message, 10);
+    // Continue with the process despite sheet clearing error
+  }
+  
+  let listingsToUpdate: GenericObject[] = [];
+  const failedClients: string[] = []; // Track which clients failed
+  const successfulClients: string[] = []; // Track which clients succeeded
+  
+  // Loop through the array of selected clients in the JSON file and scrape each URL
+  for (const [index, client] of selectedClientData.entries()) {
+    try {
+      onProgress?.(client.id, `Starting to scrape ${client.name}...`, (index / selectedClientData.length) * 80);
+      const listings = await scrapeListings(client);
+      
+      if (listings.length === 0) {
+        // Consider zero listings as an error case
+        throw new Error(`No listings found for ${client.name}`);
+      }
+      
+      onProgress?.(client.id, `Scraped ${listings.length} listings for ${client.name}`, ((index + 0.5) / selectedClientData.length) * 80);
+      console.log(`Scraped listings for ${client.name}`);
+      console.log(`Number of listings found: ${listings.length}`);
+      listingsToUpdate.push(...listings);
+      onProgress?.(client.id, `Processing data for ${client.name}...`, ((index + 0.75) / selectedClientData.length) * 80);
+      successfulClients.push(client.name);
+    } catch (error) {
+      console.error(`Error scraping client ${client.name}:`, error);
+      onProgress?.(client.id, `Error scraping ${client.name}: ${(error as Error).message}`, ((index + 0.75) / selectedClientData.length) * 80);
+      failedClients.push(client.name);
+      // Continue with the next client
+    }
+  }
+
+  // Skip sheet update if no listings were scraped
+  if (listingsToUpdate.length === 0) {
+    console.log('No listings were scraped. Skipping sheet update.');
+    if (failedClients.length > 0) {
+      const failedClientsList = failedClients.join(', ');
+      onProgress?.('all', `No data to write to sheet. All clients failed: ${failedClientsList}`, 100);
+    } else {
+      onProgress?.('all', 'No listings were scraped. Process complete.', 100);
+    }
+    return;
   }
 
   const rows = listingsToUpdate.map(listing => ([
@@ -162,18 +211,10 @@ export async function updateSheet(clientIds: string[], onProgress?: (clientId: s
   ]);
 
   try {
-    // Clear the existing data in the sheet
-    onProgress?.('all', 'Clearing existing data from sheet...', 90);
-    await sheets.spreadsheets.values.clear({
-      spreadsheetId: sheetIdToUpdate,
-      range: 'A2:AR'
-    });
-    console.log('Stale data removed...');
-
     const chunkSize = 1000; // Number of rows to insert at once
     for (let i = 0; i < rows.length; i += chunkSize) {
       const chunk = rows.slice(i, i + chunkSize);
-      const progress = 90 + ((i / rows.length) * 10);
+      const progress = 80 + ((i / rows.length) * 20);
       onProgress?.('all', `Updating sheet with new data (${i + chunk.length}/${rows.length} rows)...`, progress);
       
       // Update the sheet with new data
@@ -186,10 +227,36 @@ export async function updateSheet(clientIds: string[], onProgress?: (clientId: s
         }
       });
     }
-    onProgress?.('all', 'Sheet updated successfully!', 100);
+    
+    // Generate completion message that includes success and failure information
+    let completionMessage = 'Sheet updated successfully!';
+    
+    if (successfulClients.length > 0) {
+      completionMessage += ` Data from ${successfulClients.length} client(s) was written to the sheet.`;
+    }
+    
+    if (failedClients.length > 0) {
+      completionMessage += ` ${failedClients.length} client(s) could not be scraped: ${failedClients.join(', ')}.`;
+    }
+    
+    onProgress?.('all', completionMessage, 100);
     console.log('Sheet(s) updated successfully!');
+    if (failedClients.length > 0) {
+      console.log(`Failed clients: ${failedClients.join(', ')}`);
+    }
   } catch (err) {
     console.error('Error updating sheet:', err);
-    onProgress?.('all', 'Error updating sheet: ' + (err as Error).message, 100);
+    let errorMessage = 'Error updating sheet: ' + (err as Error).message;
+    
+    if (successfulClients.length > 0 || failedClients.length > 0) {
+      if (successfulClients.length > 0) {
+        errorMessage += ` Successfully scraped clients: ${successfulClients.join(', ')}.`;
+      }
+      if (failedClients.length > 0) {
+        errorMessage += ` Failed clients: ${failedClients.join(', ')}.`;
+      }
+    }
+    
+    onProgress?.('all', errorMessage, 100);
   }
 }
