@@ -361,7 +361,8 @@ export async function scrapeListings(data: ClientDataType): Promise<Scraper> {
       '--disable-renderer-backgrounding'
     ],
     headless: true,
-    timeout: 30000
+    timeout: 30000,
+    channel: 'chrome'
   });
   
   try {
