@@ -4,9 +4,10 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "nodemon -w src/server -x tsx src/server/main.ts",
+    "dev": "./node_modules/.bin/nodemon -w src/server -x tsx src/server/main.ts",
     "start": "NODE_ENV=production tsx src/server/main.ts",
-    "build": "vite build"
+    "build": "vite build",
+    "postinstall": "npx puppeteer browsers install chrome"
   },
   "dependencies": {
     "@types/react-select": "^5.0.0",
